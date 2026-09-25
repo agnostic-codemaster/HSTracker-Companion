@@ -5,16 +5,19 @@ ROOT=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 STAGE=${DERIVED_FILE_DIR:-/private/tmp}/HSBGSkipBuild
 OUT=${TARGET_BUILD_DIR:?}/${UNLOCALIZED_RESOURCES_FOLDER_PATH:?}/HSBGSkip
 
+# Ask SwiftPM where it put each binary: the layout under the scratch path differs between
+# SwiftPM's native build system and the Swift Build one newer Xcode releases default to.
+BINARIES=
 for ARCH in arm64 x86_64; do
-    /usr/bin/swift build --package-path "$ROOT" --scratch-path "$STAGE/$ARCH" \
-        --triple "$ARCH-apple-macosx14.0" -c release --product hsbgskipd
+    set -- --package-path "$ROOT" --scratch-path "$STAGE/$ARCH" \
+        --triple "$ARCH-apple-macosx14.0" -c release
+    /usr/bin/swift build "$@" --product hsbgskipd
+    BINARIES="$BINARIES $(/usr/bin/swift build "$@" --show-bin-path)/hsbgskipd"
 done
 
 /bin/mkdir -p "$OUT"
-/usr/bin/lipo -create \
-    "$STAGE/arm64/out/Products/Release/hsbgskipd" \
-    "$STAGE/x86_64/out/Products/Release/hsbgskipd" \
-    -output "$OUT/hsbgskipd"
+# shellcheck disable=SC2086 # BINARIES is a space-separated list of paths without spaces
+/usr/bin/lipo -create $BINARIES -output "$OUT/hsbgskipd"
 /bin/chmod 755 "$OUT/hsbgskipd"
 /bin/cp "$ROOT/LICENSE" "$OUT/LICENSE"
 /usr/bin/lipo -verify_arch arm64 "$OUT/hsbgskipd"
