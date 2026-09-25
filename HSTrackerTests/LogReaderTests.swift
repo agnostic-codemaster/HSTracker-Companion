@@ -106,7 +106,33 @@ class LogReaderTests: HSTrackerTests {
         archive.capture(path: source.path)
         XCTAssertEqual(archive.latestMatchLines(), [new.trimmingCharacters(in: .newlines)])
     }
-	
+
+    func testPowerArchiveFiltersLatestMatchAcrossReconnects() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let source = root.appendingPathComponent("Power.log")
+        let log = """
+            D 10:00 GameState.DebugPrintPower() - CREATE_GAME
+            D 10:20 GameState.DebugPrintPower() - tag=STATE value=COMPLETE
+            D 11:00 GameState.DebugPrintPower() - CREATE_GAME
+            D 11:01 PowerTaskList.DebugPrintPower() - BLOCK_START
+            D 11:02 GameState.DebugPrintPower() - TAG_CHANGE
+            D 11:05 GameState.DebugPrintPower() - CREATE_GAME
+            D 11:06 GameState.DebugPrintPower() - TAG_CHANGE
+            D 11:07 GameState.DebugPrintPower() - partial
+            """
+        try Data(log.utf8).write(to: source)
+        let archive = PowerLogArchive(directory: root.appendingPathComponent("archive"))
+        archive.capture(path: source.path)
+        XCTAssertEqual(archive.latestMatchLines(containing: "GameState."), [
+            "D 11:00 GameState.DebugPrintPower() - CREATE_GAME",
+            "D 11:02 GameState.DebugPrintPower() - TAG_CHANGE",
+            "D 11:05 GameState.DebugPrintPower() - CREATE_GAME",
+            "D 11:06 GameState.DebugPrintPower() - TAG_CHANGE"
+        ])
+    }
+
 	func testLineContent() {
 		let line = "D 00:06:10.0012345 GameState.DebugPrintPower() -     tag=ZONE value=PLAY"
 		let lineItem = LogLine(namespace: .power, line: line)
