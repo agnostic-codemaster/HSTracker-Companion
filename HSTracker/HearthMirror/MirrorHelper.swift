@@ -16,6 +16,8 @@ struct MirrorHelper {
     
     /** Internal represenation of the mirror object, do not access it directly - guarded by stateLock */
     private static var _mirror: HearthMirror?
+    private static var taskportRightRequested = false
+    private static var nextMirrorAttempt = Date.distantPast
     
     // Serializes the reads made through the mirror. Only held while a read runs,
     // never while the mirror is being initialized (see ensureMirror()).
@@ -25,7 +27,7 @@ struct MirrorHelper {
     // reader - in particular one on the main thread - wait for it.
     private static let initQueue = DispatchQueue(label: "net.hearthsim.hstracker.mirrorInitQueue", attributes: [])
     
-    // Guards _mirror, initPending and generation. Only ever held for a few
+    // Guards _mirror, initPending, generation and nextMirrorAttempt. Only ever held for a few
     // instructions, so it is safe to take on the main thread.
     private static let stateLock = NSLock()
     private static var initPending = false
@@ -89,8 +91,9 @@ struct MirrorHelper {
         stateLock.lock()
         let ready = MirrorHelper._mirror != nil
         let startGeneration = generation
+        let throttled = Date() < nextMirrorAttempt
         stateLock.unlock()
-        if ready {
+        if ready || throttled {
             return
         }
         // disable until we can fix memory reading
@@ -105,6 +108,10 @@ struct MirrorHelper {
         stateLock.lock()
         if generation == startGeneration && MirrorHelper._mirror == nil {
             MirrorHelper._mirror = newMirror
+            if newMirror == nil {
+                // retry at most every 5s rather than on every getter
+                nextMirrorAttempt = Date().addingTimeInterval(5)
+            }
         } else if newMirror != nil {
             logger.verbose("Discarding HearthMirror initialized before the mirror was destroyed")
         }
@@ -120,10 +127,13 @@ struct MirrorHelper {
     }
     
     private static func initMirror(pid: Int32, blocking: Bool) -> HearthMirror? {
-        
-        // get rights to attach
-        if acquireTaskportRight() != 0 {
-            logger.error("acquireTaskportRight() failed!")
+        // The authorization belongs to this process. Repeating this call on every
+        // mirror retry can show the system permission dialog over and over.
+        if !taskportRightRequested {
+            taskportRightRequested = true
+            if acquireTaskportRight() != 0 {
+                logger.error("acquireTaskportRight() failed!")
+            }
         }
         
         let mirror = HearthMirror(pid: pid,
@@ -157,6 +167,7 @@ struct MirrorHelper {
             stateLock.lock()
             MirrorHelper._mirror = nil
             generation += 1
+            nextMirrorAttempt = .distantPast
             stateLock.unlock()
         }
     }
@@ -552,11 +563,41 @@ struct MirrorHelper {
     }
     
     static func getLogSessionDir() -> String {
+        // Log tracking must not depend on memory-reading permission. HearthMirror
+        // can fail to attach on a new macOS release even while Hearthstone is
+        // writing perfectly usable Power and LoadingScreen logs.
+        if let app = CoreManager.hearthstoneApp,
+           let bundle = app.bundleURL,
+           let launchDate = app.launchDate {
+            let logsRoot = bundle.deletingLastPathComponent().appendingPathComponent("Logs")
+            if FileManager.default.fileExists(atPath: logsRoot.path) {
+                return latestLogSessionDir(in: logsRoot, launchedAfter: launchDate) ?? ""
+            }
+        }
         var result: String?
         MirrorHelper.withMirrorAccess {
             result = mirror?.getLogSessionDir()
         }
         return result ?? ""
+    }
+
+    static func latestLogSessionDir(in logsRoot: URL, launchedAfter launchDate: Date) -> String? {
+        let fileManager = FileManager.default
+        guard let names = try? fileManager.contentsOfDirectory(atPath: logsRoot.path) else {
+            return nil
+        }
+        for name in names.filter({ $0.hasPrefix("Hearthstone_") }).sorted().reversed() {
+            let directory = logsRoot.appendingPathComponent(name, isDirectory: true)
+            guard let attributes = try? fileManager.attributesOfItem(atPath: directory.path),
+                  let created = attributes[.creationDate] as? Date,
+                  created >= launchDate.addingTimeInterval(-5) else { continue }
+            if ["Power.log", "LoadingScreen.log", "Hearthstone.log"].contains(where: {
+                fileManager.fileExists(atPath: directory.appendingPathComponent($0).path)
+            }) {
+                return directory.path
+            }
+        }
+        return nil
     }
     
     static func getDeckPickerDecksOnPage() -> [MirrorCollectionDeckBoxVisual?] {
@@ -727,4 +768,3 @@ struct MirrorHelper {
         return result
     }
 }
-

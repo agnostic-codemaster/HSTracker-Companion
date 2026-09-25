@@ -34,6 +34,78 @@ class LogReaderTests: HSTrackerTests {
 		XCTAssert(loglines[1].time > loglines[2].time, "\(loglines[1].time) is not bigger than \(loglines[2].time)")
         XCTAssert(loglines[3].time > loglines[1].time, "\(loglines[3].time) is not bigger than \(loglines[1].time)")
 	}
+
+    func testLogSessionDiscoveryUsesCurrentGameDirectoryWithoutMirror() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+
+        let launchDate = Date().addingTimeInterval(-30)
+        let older = root.appendingPathComponent("Hearthstone_2026_09_23_09_00_00")
+        let current = root.appendingPathComponent("Hearthstone_2026_09_24_09_00_00")
+        try FileManager.default.createDirectory(at: older, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: current, withIntermediateDirectories: true)
+        try Data().write(to: older.appendingPathComponent("Power.log"))
+        try Data().write(to: current.appendingPathComponent("LoadingScreen.log"))
+
+        XCTAssertEqual(MirrorHelper.latestLogSessionDir(in: root, launchedAfter: launchDate), current.path)
+        XCTAssertNil(MirrorHelper.latestLogSessionDir(in: root,
+                                                     launchedAfter: Date().addingTimeInterval(60)))
+    }
+
+    func testPowerArchiveResumesAtCommittedOffsetWithoutDuplicatingReconnectLines() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let source = root.appendingPathComponent("Power.log")
+        let first = "D 10:00:00 GameState.DebugPrintPower() - CREATE_GAME\n"
+        try Data(first.utf8).write(to: source)
+
+        let archive = PowerLogArchive(directory: root.appendingPathComponent("archive"))
+        archive.capture(path: source.path)
+        XCTAssertEqual(archive.latestMatchLines().count, 1)
+
+        let reconnect = "D 10:01:00 GameState.DebugPrintPower() - CREATE_GAME\n"
+        let handle = try FileHandle(forWritingTo: source)
+        try handle.seekToEnd()
+        try handle.write(contentsOf: Data(reconnect.utf8))
+        try handle.close()
+
+        let restarted = PowerLogArchive(directory: root.appendingPathComponent("archive"))
+        restarted.capture(path: source.path)
+        restarted.capture(path: source.path)
+        XCTAssertEqual(restarted.latestMatchLines(), [first.trimmingCharacters(in: .newlines),
+                                                       reconnect.trimmingCharacters(in: .newlines)])
+    }
+
+    func testPowerArchiveStartsNewSessionWhenSourceIsTruncated() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let source = root.appendingPathComponent("Power.log")
+        let old = "D 10:00 GameState.DebugPrintPower() - CREATE_GAME\nD 10:20 GameState.DebugPrintPower() - OLD_EVENT\n"
+        try Data(old.utf8).write(to: source)
+        let archive = PowerLogArchive(directory: root.appendingPathComponent("archive"))
+        archive.capture(path: source.path)
+
+        let new = "D 11:00 GameState.DebugPrintPower() - CREATE_GAME\n"
+        try Data(new.utf8).write(to: source)
+        archive.capture(path: source.path)
+        XCTAssertEqual(archive.latestMatchLines(), [new.trimmingCharacters(in: .newlines)])
+    }
+
+    func testPowerArchiveKeepsLatestGameAfterPreviousComplete() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let source = root.appendingPathComponent("Power.log")
+        let old = "D 10:00 GameState.DebugPrintPower() - CREATE_GAME\nD 10:20 GameState.DebugPrintPower() - tag=STATE value=COMPLETE\n"
+        let new = "D 11:00 GameState.DebugPrintPower() - CREATE_GAME\n"
+        try Data((old + new).utf8).write(to: source)
+        let archive = PowerLogArchive(directory: root.appendingPathComponent("archive"))
+        archive.capture(path: source.path)
+        XCTAssertEqual(archive.latestMatchLines(), [new.trimmingCharacters(in: .newlines)])
+    }
 	
 	func testLineContent() {
 		let line = "D 00:06:10.0012345 GameState.DebugPrintPower() -     tag=ZONE value=PLAY"
