@@ -14,7 +14,7 @@
 
 在此之上，本仓库新增了：用 HSBGSkip 本地服务替代 Clash 拔线、按局归档 Power.log 并在重启后续读、拔线重连后拼接多段日志再上传 HSReplay、上传结果记录与重试，以及停用上游自动更新。
 
-同步上游时，`hstracker-chs` 远端指向 alamo68/HSTracker_CHS，`hearthsim` 远端指向 HearthSim/HSTracker。
+同步上游时，`hstracker-chs` 远端指向 alamo68/HSTracker_CHS，`upstream` 远端指向 HearthSim/HSTracker。
 
 ## 主要功能
 
