@@ -20,5 +20,6 @@ done
 /usr/bin/lipo -create $BINARIES -output "$OUT/hsbgskipd"
 /bin/chmod 755 "$OUT/hsbgskipd"
 /bin/cp "$ROOT/LICENSE" "$OUT/LICENSE"
-/usr/bin/lipo -verify_arch arm64 "$OUT/hsbgskipd"
-/usr/bin/lipo -verify_arch x86_64 "$OUT/hsbgskipd"
+for ARCH in arm64 x86_64; do
+    /usr/bin/lipo "$OUT/hsbgskipd" -verify_arch "$ARCH"
+done

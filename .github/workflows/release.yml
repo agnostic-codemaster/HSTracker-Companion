@@ -43,8 +43,8 @@ jobs:
           archive="build/HSTracker-Companion-${version}-macOS14-universal.zip"
           app=build/DerivedData/Build/Products/Release/HSTracker.app
 
-          lipo -verify_arch arm64 x86_64 "$app/Contents/MacOS/HSTracker"
-          lipo -verify_arch arm64 x86_64 "$app/Contents/Resources/HSBGSkip/hsbgskipd"
+          for arch in arm64 x86_64; do lipo "$app/Contents/MacOS/HSTracker" -verify_arch "$arch"; done
+          for arch in arm64 x86_64; do lipo "$app/Contents/Resources/HSBGSkip/hsbgskipd" -verify_arch "$arch"; done
           Tools/package-local.sh "$app" "$archive"
 
           echo "version=$version" >> "$GITHUB_OUTPUT"
