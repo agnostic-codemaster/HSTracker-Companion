@@ -14,9 +14,36 @@ This repository builds on three open-source projects:
 | [HSTracker_CHS](https://github.com/alamo68/HSTracker_CHS) | alamo68 | Direct parent. This repository keeps its git history: the Chinese localization, the disabled-minions panel, the Chinese Bob's Buddy panel and the merged top-left panel. |
 | [hsbg-companion](https://github.com/zilinfg/hsbg-companion) | Zilin Fang | The disconnect backend. Its connection matching and pf rules were ported into the `HSBGSkip` daemon, replacing the Clash-based skip of HSTracker_CHS. |
 
-On top of these, this repository adds the local HSBGSkip service in place of the Clash skip, a per-game Power.log archive that tracking resumes from after a restart, stitching of reconnected log segments into a single HSReplay upload, a record of upload results with retry, and turns off auto-updating from upstream HSTracker.
+What this repository changes on top of HSTracker_CHS is listed in [Changes from HSTracker_CHS](#changes-from-hstracker_chs).
 
 For syncing, the `upstream` remote points to HearthSim/HSTracker and `hstracker-chs` to alamo68/HSTracker_CHS. See [docs/upstream-sync.md](docs/upstream-sync.md) (in Chinese).
+
+## Changes from HSTracker_CHS
+
+Everything HSTracker_CHS already had is kept. The changes below are what this repository adds or replaces.
+
+**Disconnect without Clash**
+
+- The Clash-based skip is replaced by `HSBGSkip`, a local LaunchDaemon that cuts the connection with a pf rule. Clash, TUN mode and proxy configuration are no longer needed.
+- The target is the game server recorded in `GameNetLogger.log`, matched against Hearthstone's live connections. The skip is refused outside a game, when the log is missing, or when more than one connection matches, instead of cutting a guessed port.
+- Each disconnect lasts 3 seconds, with at least 8 seconds between two, so a double press cannot kill the reconnect.
+- The service is installed, checked, upgraded and uninstalled from 「拔线 → 服务设置…」 inside the app. An existing HSBG Companion service is migrated, and restored if the new service fails its checks.
+
+**Tracking that survives a reconnect**
+
+- Power.log is archived per game together with the read position, so tracking resumes after a reconnect or an app restart instead of losing the game.
+- Battlegrounds history keeps games that are missing a hero or placement, marked unknown or incomplete, instead of dropping them.
+
+**HSReplay uploads**
+
+- When a reconnect splits one game into several `CREATE_GAME` segments, they are stitched into a single upload. If stitching fails, the last usable segment is sent and marked partial.
+- The archived log is used only for reconnected games. Other games upload as before.
+- Every upload is recorded as complete, partial, rejected or pending retry, under 「拔线 → HSReplay 上传记录」. Network failures can be retried from the menu.
+
+**Other**
+
+- Auto-updating from upstream HSTracker is turned off, so an update cannot replace this build.
+- An English README, and a guide for syncing with both upstreams.
 
 ## Features
 
