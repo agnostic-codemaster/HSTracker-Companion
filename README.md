@@ -1,62 +1,66 @@
 # HSTracker Companion
 
-面向酒馆战棋玩家的 macOS 记牌器：中文界面、禁用随从面板、Bob's Buddy、一键拔线，以及拔线重连后的对局追踪与 HSReplay 上传。拔线不需要 Clash、TUN 或代理。整合计划与验收范围见 [实施计划](docs/hsbg-companion-integration-plan.md)。
+English | [简体中文](README.zh-CN.md)
 
-## 项目来源
+A macOS deck tracker for Hearthstone Battlegrounds with a Chinese interface, a disabled-minions panel, Bob's Buddy, one-click disconnect ("skip"), and game tracking and HSReplay uploads that survive a reconnect. The disconnect needs no Clash, TUN or proxy. See the [integration plan](docs/hsbg-companion-integration-plan.md) for scope and acceptance criteria (in Chinese).
 
-本仓库不是从零开发，而是在以下三个开源项目的基础上整合修改而成：
+## Origins
 
-| 项目 | 作者 | 在本仓库中的作用 |
+This repository builds on three open-source projects:
+
+| Project | Author | Role here |
 | --- | --- | --- |
-| [HSTracker](https://github.com/HearthSim/HSTracker) | HearthSim | 记牌器本体。当前基于 3.6.13。 |
-| [HSTracker_CHS](https://github.com/alamo68/HSTracker_CHS) | alamo68 | 直接父仓库。本仓库沿用它的 git 历史，包括中文化、禁用随从面板、Bob's Buddy 中文面板、合并的左上角面板等修改。 |
-| [hsbg-companion](https://github.com/zilinfg/hsbg-companion) | Zilin Fang | 拔线后端。它的连接识别与 pf 规则实现被移植为 `HSBGSkip` 守护进程，取代 HSTracker_CHS 原先基于 Clash 的拔线。 |
+| [HSTracker](https://github.com/HearthSim/HSTracker) | HearthSim | The tracker itself. Currently based on 3.6.13. |
+| [HSTracker_CHS](https://github.com/alamo68/HSTracker_CHS) | alamo68 | Direct parent. This repository keeps its git history: the Chinese localization, the disabled-minions panel, the Chinese Bob's Buddy panel and the merged top-left panel. |
+| [hsbg-companion](https://github.com/zilinfg/hsbg-companion) | Zilin Fang | The disconnect backend. Its connection matching and pf rules were ported into the `HSBGSkip` daemon, replacing the Clash-based skip of HSTracker_CHS. |
 
-在此之上，本仓库新增了：用 HSBGSkip 本地服务替代 Clash 拔线、按局归档 Power.log 并在重启后续读、拔线重连后拼接多段日志再上传 HSReplay、上传结果记录与重试，以及停用上游自动更新。
+On top of these, this repository adds the local HSBGSkip service in place of the Clash skip, a per-game Power.log archive that tracking resumes from after a restart, stitching of reconnected log segments into a single HSReplay upload, a record of upload results with retry, and turns off auto-updating from upstream HSTracker.
 
-同步上游时，`hstracker-chs` 远端指向 alamo68/HSTracker_CHS，`upstream` 远端指向 HearthSim/HSTracker。
+For syncing, the `upstream` remote points to HearthSim/HSTracker and `hstracker-chs` to alamo68/HSTracker_CHS. See [docs/upstream-sync.md](docs/upstream-sync.md) (in Chinese).
 
-## 主要功能
+## Features
 
-- 对局左上角合并面板提供「一键拔线」及当前禁用种族；也可使用「拔线」菜单、Dock 菜单或 `⌘⇧K`。
-- 只在 `GameNetLogger.log` 记录的对局服务器地址与炉石进程实时连接唯一且精确匹配时执行拔线。对局外、日志缺失或连接有歧义时拒绝操作。每次断线 3 秒，两次操作至少间隔 8 秒。
-- 重连后根据当前日志与 HearthMirror 恢复后续实时追踪。原始 Power 日志及读取位置保存在本机，以便重启后继续读取；客户端未产生的事件不会被补写。
-- 对局历史会保留缺少英雄或名次等字段的酒馆战棋对局，并以「未知」「不完整」标识。HSReplay 上传结果可在「拔线 → HSReplay 上传记录」查看，网络失败可从菜单重试。
+- The merged top-left panel in a game offers a one-click disconnect (「一键拔线」) and shows the banned tribes. The 「拔线」 (Skip) menu, the Dock menu and `⌘⇧K` do the same.
+- A disconnect only happens when the game server recorded in `GameNetLogger.log` matches exactly one live connection of the Hearthstone process. Outside a game, with the log missing, or when the match is ambiguous, it is refused. Each disconnect lasts 3 seconds, with at least 8 seconds between two.
+- After a reconnect, live tracking resumes from the current log and HearthMirror. The raw Power log and the read position are kept on disk so tracking can continue after a restart. Events the client never wrote are not made up.
+- Game history keeps Battlegrounds games that lack a hero or placement, marked as unknown or incomplete. HSReplay upload results are listed under 「拔线 → HSReplay 上传记录」 (Skip → HSReplay uploads), and network failures can be retried from the menu.
 
-## 截图
+## Screenshots
 
-![游戏内整体效果](docs/images/game-overlay.jpg)
+![In-game overlay](docs/images/game-overlay.jpg)
 
-![左上角面板](docs/images/top-left-panel.jpg)
+![Top-left panel](docs/images/top-left-panel.jpg)
 
-![Bob's Buddy 中文面板](docs/images/bobs-buddy.jpg)
+![Bob's Buddy panel in Chinese](docs/images/bobs-buddy.jpg)
 
-## 安装与拔线服务
+## Installing the disconnect service
 
-最低支持 macOS 14。将构建好的 `HSTracker.app` 放入「应用程序」后，打开应用菜单「拔线 → 服务设置…」，选择「安装服务」，并在 macOS 管理员授权窗口中确认。应用包中已经包含 Intel 与 Apple Silicon 通用版本的独立 LaunchDaemon。之后可在同一入口检测、升级或卸载服务。
+Requires macOS 14 or later. Put the built `HSTracker.app` in Applications, open 「拔线 → 服务设置…」 (Skip → Service settings…), choose 「安装服务」 (Install service) and confirm in the macOS administrator prompt. The app bundle carries a standalone universal (Intel and Apple Silicon) LaunchDaemon. The same window can check, upgrade or uninstall it.
 
-如果电脑中已有 HSBG Companion 的旧拔线服务，安装界面会提示迁移。安装程序先恢复并停用旧服务，再安装新服务；新服务未能通过启动和通信端口检查时，会恢复旧服务。迁移后不再依赖 Companion 的菜单栏应用。卸载整合版服务会清除它自己的 pf 规则。
+If the older HSBG Companion service is installed, the installer offers to migrate: it restores and stops the old service, then installs the new one, and puts the old one back if the new one fails its launch and port checks. The Companion menu bar app is no longer needed afterwards. Uninstalling removes the service's own pf rules.
 
-进入实际对局后点击左上角「一键拔线」，或使用菜单、Dock 菜单和 `⌘⇧K`。服务只处理炉石对局连接；若检测不到唯一目标，菜单「拔线 → 检测拔线服务」会给出状态。必要时可选「立即恢复连接」。
+In a game, click 「一键拔线」 in the top-left panel, or use the menu, the Dock menu or `⌘⇧K`. The service only acts on Hearthstone game connections. If no single target is found, 「拔线 → 检测拔线服务」 (Skip → Check service) reports the state, and 「立即恢复连接」 (Reconnect now) restores the connection.
 
-首次安装后的真实对局检查步骤见 [验收记录](docs/hsbg-integration-acceptance.md)。
+The checklist for a first real game after installing is in [the acceptance record](docs/hsbg-integration-acceptance.md) (in Chinese).
 
-## 对局与上传记录
+## Game and upload records
 
-应用在自己的支持目录保存 `PowerLogArchive`、`BgsLastGames.json` 和 `ReplayUploadResults.json`。重连或重启后，只追踪仍可从日志及游戏取得的状态。HSReplay 上传候选由原始日志构造；多次 `CREATE_GAME` 时保留完整原始片段，并将可用后段标为「部分」。日志缺少起点或必要元数据时不发送，上传结果明确标为「完整」「部分」「被拒绝」或「待重试」。HSReplay 对残缺日志的接受结果取决于其服务端。
+The app keeps `PowerLogArchive`, `BgsLastGames.json` and `ReplayUploadResults.json` in `~/Library/Application Support/HSTracker`. After a reconnect or restart it only tracks state that can still be read from the logs and the game.
 
-## 从源码构建
+HSReplay uploads are built from the raw log. When a game has several `CREATE_GAME` blocks, the segments are stitched into one upload. If stitching fails, the last usable segment is sent and marked partial. Logs missing their start or required metadata are not sent. Each upload is recorded as complete, partial, rejected or pending retry. Whether HSReplay accepts an incomplete log is up to its server.
 
-需要 macOS 14 或更新版本、Xcode，以及可用的 Swift Package Manager 依赖。执行：
+## Building from source
+
+Requires macOS 14 or later, Xcode, and working Swift Package Manager dependencies:
 
 ```bash
 xcodebuild -project HSTracker.xcodeproj -scheme HSTracker -configuration Release CODE_SIGNING_ALLOWED=NO build
 ```
 
-HSTracker 3.6.13 依赖的 HearthMirror `1a6012b5` 尚未由 HearthSim 发布到 libs.hearthsim.net，因此本仓库暂时固定使用 `912e88ea`，并通过 `HSTracker/HearthMirror/MinionPoolCompat.swift` 关闭「从游戏读取酒馆随从池」功能，随从浏览器回退到内置数据库。等新版可下载后，按该文件顶部注释即可恢复。
+HSTracker 3.6.13 needs HearthMirror `1a6012b5`, which HearthSim has not published on libs.hearthsim.net yet. This repository pins `912e88ea` instead, and `HSTracker/HearthMirror/MinionPoolCompat.swift` turns off reading the tavern minion pool from the game, so the minion browser falls back to the built-in database. The comment at the top of that file explains how to switch back once the new version is available.
 
-构建阶段会分别编译 arm64 和 x86_64 的 `hsbgskipd`，合并后放入应用资源目录。用于本机安装时，运行 `Tools/package-local.sh <Release/HSTracker.app 路径>`，脚本会对整个应用包做临时签名并验证，再生成压缩包。直接使用 `CODE_SIGNING_ALLOWED=NO` 的构建产物会使 macOS 无法稳定识别应用的权限身份。临时签名仅保证同一构建在本机的身份一致；安装新的构建时仍可能需要重新授权。公开发布所需的开发者签名和公证不在本期范围内。为防止整合版被上游程序覆盖，上游自动更新已停用。
+The build compiles `hsbgskipd` for arm64 and x86_64 and puts the universal binary into the app's resources. To install locally, run `Tools/package-local.sh <path to Release/HSTracker.app>`, which ad-hoc signs and verifies the whole bundle and zips it. An unsigned `CODE_SIGNING_ALLOWED=NO` build does not give macOS a stable identity for permissions. Ad-hoc signing keeps one build's identity stable on this Mac, but a new build may need to be authorized again. Developer ID signing and notarization are out of scope. Auto-updating from upstream HSTracker is turned off so it cannot replace this build.
 
-## 许可与致谢
+## License and credits
 
-本项目遵循仓库根目录 [LICENSE](LICENSE)（HSTracker 的 MIT 许可）。拔线后端保留 HSBG Companion 的 [MIT 许可声明](HSBGSkip/LICENSE)；其实现最初借鉴了 [hearthstone_skipper](https://github.com/z2z63/hearthstone_skipper) 的思路。感谢 HearthSim/HSTracker、alamo68/HSTracker_CHS、zilinfg/hsbg-companion 的作者，以及 LINUX DO 社区的贡献和反馈。
+Licensed under the [LICENSE](LICENSE) at the repository root (HSTracker's MIT license). The disconnect backend keeps HSBG Companion's [MIT notice](HSBGSkip/LICENSE); its approach was first inspired by [hearthstone_skipper](https://github.com/z2z63/hearthstone_skipper). Thanks to the authors of HearthSim/HSTracker, alamo68/HSTracker_CHS and zilinfg/hsbg-companion, and to the LINUX DO community for contributions and feedback.
