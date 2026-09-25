@@ -10,7 +10,7 @@ import Foundation
 
 enum NotificationType {
     case gameStart, turnStart, opponentConcede, hsReplayPush(replayId: String), hsReplayUploadFailed(error: String),
-         hsReplayCollectionUploaded, hsReplayMercenariesCollectionUploaded, hsReplayCollectionUploadFailed(error: String), hsReplayMercenariesCollectionUploadFailed(error: String), updateAvailable(version: String), restartRequired
+         hsReplayCollectionUploaded, hsReplayMercenariesCollectionUploaded, hsReplayCollectionUploadFailed(error: String), hsReplayMercenariesCollectionUploadFailed(error: String), restartRequired
 }
 
 class NotificationManager {
@@ -83,11 +83,6 @@ class NotificationManager {
             show(title: String.localizedString("HSReplay", comment: ""),
                  message: String(format: String.localizedString("Failed to upload Mercenaries collection: %@", comment: ""), "\(error)"), duration: 10, fontSize: 8)
             
-        case .updateAvailable(let version):
-            show(title: String.localizedString("A new update is available", comment: ""),
-                 message: String(format: String.localizedString("Version %@ is now available", comment: ""), version), duration: 30, action: {
-                AppDelegate.instance().sparkleUpdater.checkForUpdates(nil)
-            })
         case .restartRequired:
             show(title: String.localizedString("Hearthstone restart required!", comment: ""),
                  message: String.localizedString("Please restart Hearthstone", comment: ""), duration: 10)

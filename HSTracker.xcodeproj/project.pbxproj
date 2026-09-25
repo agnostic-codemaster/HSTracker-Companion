@@ -306,8 +306,6 @@
 		439212151DEF5A5E0017AAE5 /* MultiClassGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439212141DEF5A5E0017AAE5 /* MultiClassGroup.swift */; };
 		439BD8C91EBCD40200959F69 /* EnumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439BD8C81EBCD40200959F69 /* EnumTests.swift */; };
 		439C7E4C1C7772C000D29859 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439C7E4B1C7772C000D29859 /* AppDelegate.swift */; };
-		AA11C0DE2F0010000000A002 /* ClashSkipper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11C0DE2F0010000000A001 /* ClashSkipper.swift */; };
-		BB22C0DE2F0010000000B002 /* DisabledRacesPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22C0DE2F0010000000B001 /* DisabledRacesPanel.swift */; };
 		439C7E851C777CFC00D29859 /* Deck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439C7E7D1C777CFC00D29859 /* Deck.swift */; };
 		439C7E891C777CFC00D29859 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439C7E811C777CFC00D29859 /* Card.swift */; };
 		439C7E8D1C777D1C00D29859 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439C7E8C1C777D1C00D29859 /* Database.swift */; };
@@ -332,6 +330,7 @@
 		439C7EC91C777F8900D29859 /* LogLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439C7EAD1C777F8900D29859 /* LogLine.swift */; };
 		439C7ECA1C777F8900D29859 /* LogReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439C7EAF1C777F8900D29859 /* LogReader.swift */; };
 		439C7ECB1C777F8900D29859 /* LogReaderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439C7EB11C777F8900D29859 /* LogReaderManager.swift */; };
+		AA11C0DE2F0010000000C002 /* PowerLogArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11C0DE2F0010000000C001 /* PowerLogArchive.swift */; };
 		439C7ECC1C777F8900D29859 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439C7EB31C777F8900D29859 /* Player.swift */; };
 		439C7EDE1C777FA900D29859 /* ImageUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439C7ECF1C777FA900D29859 /* ImageUtils.swift */; };
 		439DD8F41DB23212004EBE47 /* PlayerTurn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439DD8F31DB23212004EBE47 /* PlayerTurn.swift */; };
@@ -364,6 +363,7 @@
 		43C567FD1D5E448200451B6F /* HSReplayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C567FC1D5E448200451B6F /* HSReplayManager.swift */; };
 		43C567FF1D5E4F9700451B6F /* HSReplayAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C567FE1D5E4F9700451B6F /* HSReplayAPI.swift */; };
 		43C568011D5E584F00451B6F /* LogUploader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C568001D5E584F00451B6F /* LogUploader.swift */; };
+		AA11C0DE2F0010000000D002 /* ReplayUploadStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11C0DE2F0010000000D001 /* ReplayUploadStore.swift */; };
 		43C568031D5E59E500451B6F /* UploadResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C568021D5E59E500451B6F /* UploadResult.swift */; };
 		43C568051D5E5BFF00451B6F /* UploadMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C568041D5E5BFF00451B6F /* UploadMetaData.swift */; };
 		43D307FB1C83159C00480488 /* SizeHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D307FA1C83159C00480488 /* SizeHelper.swift */; };
@@ -702,6 +702,7 @@
 		A8B6CDB7E06BEE5EFEB10B8F /* BattlegroundsQuestGuidesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1B5B7EC48DAD9E849EF3D2 /* BattlegroundsQuestGuidesViewModel.swift */; };
 		A9040F0022FA987F8E479834 /* Webspinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 174A8FB14DC7DF2733333DF3 /* Webspinner.swift */; };
 		A97B91F9EC391E15D21DE22E /* PrimordialLord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC8C901994B9A28E00A2CA7 /* PrimordialLord.swift */; };
+		AA11C0DE2F0010000000A002 /* SkipServiceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11C0DE2F0010000000A001 /* SkipServiceController.swift */; };
 		AA2B3C4D5E6F7A8B9C0D1E2F /* BattlegroundsMinionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1B2C3D4E5F6A7B8C9D0E1F /* BattlegroundsMinionsViewModel.swift */; };
 		AAA4195170E0893DEB32F078 /* HiddenObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC20104E1697490E74A34F11 /* HiddenObjects.swift */; };
 		AAF1CD3459A815232313323C /* EndtimeMurozond.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD495F983326D4215A7EA995 /* EndtimeMurozond.swift */; };
@@ -1645,6 +1646,7 @@
 		BACD1EB288F512374C258613 /* TimeLostGlaive.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F632B0FAC6E418BA6120A3 /* TimeLostGlaive.swift */; };
 		BAED4FFF96D705E30E03975C /* WingsOfEternity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3E27BE1599147ADAFD8F233 /* WingsOfEternity.swift */; };
 		BB1E2DBDBCC2F9ADF7DFF8CE /* Morchie.swift in Sources */ = {isa = PBXBuildFile; fileRef = BABA51575A05D22AE6F0F46A /* Morchie.swift */; };
+		BB22C0DE2F0010000000B002 /* DisabledRacesPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22C0DE2F0010000000B001 /* DisabledRacesPanel.swift */; };
 		BB2C3D4E5F6A7B8C9D0E1F2A /* BattlegroundsMinionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1C2D3E4F5A6B7C8D9E0F1A /* BattlegroundsMinionsView.swift */; };
 		BB5E551A0000000000000002 /* BattlegroundsSessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB5E551A0000000000000001 /* BattlegroundsSessionViewModel.swift */; };
 		BB5E551A0000000000000005 /* BattlegroundsSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB5E551A0000000000000004 /* BattlegroundsSessionView.swift */; };
@@ -2221,8 +2223,6 @@
 		439BD8C81EBCD40200959F69 /* EnumTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnumTests.swift; sourceTree = "<group>"; };
 		439C7E481C7772C000D29859 /* HSTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HSTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		439C7E4B1C7772C000D29859 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = HSTracker/AppDelegate.swift; sourceTree = "<group>"; };
-		AA11C0DE2F0010000000A001 /* ClashSkipper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ClashSkipper.swift; path = HSTracker/ClashSkipper.swift; sourceTree = "<group>"; };
-		BB22C0DE2F0010000000B001 /* DisabledRacesPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DisabledRacesPanel.swift; path = HSTracker/DisabledRacesPanel.swift; sourceTree = "<group>"; };
 		439C7E571C7772C000D29859 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = HSTracker/Info.plist; sourceTree = "<group>"; };
 		439C7E5C1C7772C100D29859 /* HSTrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HSTrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		439C7E601C7772C100D29859 /* HSTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSTrackerTests.swift; sourceTree = "<group>"; };
@@ -2253,6 +2253,7 @@
 		439C7EAD1C777F8900D29859 /* LogLine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogLine.swift; sourceTree = "<group>"; };
 		439C7EAF1C777F8900D29859 /* LogReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogReader.swift; sourceTree = "<group>"; };
 		439C7EB11C777F8900D29859 /* LogReaderManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogReaderManager.swift; sourceTree = "<group>"; };
+		AA11C0DE2F0010000000C001 /* PowerLogArchive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerLogArchive.swift; sourceTree = "<group>"; };
 		439C7EB31C777F8900D29859 /* Player.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		439C7ECF1C777FA900D29859 /* ImageUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageUtils.swift; sourceTree = "<group>"; };
 		439C7ED11C777FA900D29859 /* InitialConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InitialConfiguration.swift; sourceTree = "<group>"; };
@@ -2280,6 +2281,7 @@
 		43C567FC1D5E448200451B6F /* HSReplayManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HSReplayManager.swift; sourceTree = "<group>"; };
 		43C567FE1D5E4F9700451B6F /* HSReplayAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HSReplayAPI.swift; sourceTree = "<group>"; };
 		43C568001D5E584F00451B6F /* LogUploader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogUploader.swift; sourceTree = "<group>"; };
+		AA11C0DE2F0010000000D001 /* ReplayUploadStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReplayUploadStore.swift; sourceTree = "<group>"; };
 		43C568021D5E59E500451B6F /* UploadResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UploadResult.swift; sourceTree = "<group>"; };
 		43C568041D5E5BFF00451B6F /* UploadMetaData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UploadMetaData.swift; sourceTree = "<group>"; };
 		43D307FA1C83159C00480488 /* SizeHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SizeHelper.swift; sourceTree = "<group>"; };
@@ -2627,6 +2629,7 @@
 		A96844049B1E2B17ACC2A290 /* ArchivistElysiana.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchivistElysiana.swift; sourceTree = "<group>"; };
 		A97939C4EA13DEC8A16EB021 /* MulliganV2StatusData.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MulliganV2StatusData.swift; sourceTree = "<group>"; };
 		AA118E25CF8B46DA9C97451E /* OverlayToastPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayToastPanel.swift; sourceTree = "<group>"; };
+		AA11C0DE2F0010000000A001 /* SkipServiceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SkipServiceController.swift; path = HSTracker/SkipServiceController.swift; sourceTree = "<group>"; };
 		AA1B2C3D4E5F6A7B8C9D0E1F /* BattlegroundsMinionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattlegroundsMinionsViewModel.swift; sourceTree = "<group>"; };
 		AA3DB15609E8DD81E526C05C /* FlintFirearm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlintFirearm.swift; sourceTree = "<group>"; };
 		AA91B2C5880F366B5209463B /* CountersOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountersOverlayView.swift; sourceTree = "<group>"; };
@@ -3567,6 +3570,7 @@
 		BABA51575A05D22AE6F0F46A /* Morchie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Morchie.swift; sourceTree = "<group>"; };
 		BAE324986D4023F7517FD8C9 /* TonicOfTyranny.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TonicOfTyranny.swift; sourceTree = "<group>"; };
 		BB1C2D3E4F5A6B7C8D9E0F1A /* BattlegroundsMinionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattlegroundsMinionsView.swift; sourceTree = "<group>"; };
+		BB22C0DE2F0010000000B001 /* DisabledRacesPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DisabledRacesPanel.swift; path = HSTracker/DisabledRacesPanel.swift; sourceTree = "<group>"; };
 		BB5E551A0000000000000001 /* BattlegroundsSessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattlegroundsSessionViewModel.swift; sourceTree = "<group>"; };
 		BB5E551A0000000000000004 /* BattlegroundsSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattlegroundsSessionView.swift; sourceTree = "<group>"; };
 		BB5E551A0000000000000007 /* BattlegroundsSessionTileArt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattlegroundsSessionTileArt.swift; sourceTree = "<group>"; };
@@ -4161,7 +4165,7 @@
 				F731044E211FF0050082651C /* Translations */,
 				439C7E4A1C7772C000D29859 /* HSTracker */,
 				439C7E4B1C7772C000D29859 /* AppDelegate.swift */,
-				AA11C0DE2F0010000000A001 /* ClashSkipper.swift */,
+				AA11C0DE2F0010000000A001 /* SkipServiceController.swift */,
 				BB22C0DE2F0010000000B001 /* DisabledRacesPanel.swift */,
 				439C7E791C7779D200D29859 /* HSTracker-Bridging-Header.h */,
 				439C7E571C7772C000D29859 /* Info.plist */,
@@ -4310,6 +4314,7 @@
 				432A392E1CF0B0F80029F0EA /* LogReaderInfo.swift */,
 				439C7EB11C777F8900D29859 /* LogReaderManager.swift */,
 				12CB37BE5C722DAC9773D151 /* RewoundEntityCreationFilter.swift */,
+				AA11C0DE2F0010000000C001 /* PowerLogArchive.swift */,
 				3CB1A35E2E8C63010090486F /* MixpanelEvents.swift */,
 				B8591FF72B24919F00B907A4 /* MulliganState.swift */,
 				B8DC376025D06C2F00452A83 /* OpponentDeadForTracker.swift */,
@@ -4488,6 +4493,7 @@
 				433554381D5FABD600277B27 /* HSReplayPreferences.swift */,
 				4335543C1D5FAF0300277B27 /* HSReplayPreferences.xib */,
 				43C568001D5E584F00451B6F /* LogUploader.swift */,
+				AA11C0DE2F0010000000D001 /* ReplayUploadStore.swift */,
 				B82E7B15262A798000C42EF0 /* ShortIdHelper.swift */,
 			);
 			path = HSReplay;
@@ -6668,6 +6674,7 @@
 				B86F2153255DBFFC008D522A /* Download cards XML */,
 				B8CD01032FA0000000CD0103 /* Compile CardDefs */,
 				B83355B724F89D1A0025F644 /* Embed Mono */,
+				AA11C0DE2F0010000000B001 /* Build HSBGSkip daemon */,
 				4368741F201720A800C9D1E9 /* Update version */,
 			);
 			buildRules = (
@@ -6744,9 +6751,7 @@
 				TargetAttributes = {
 					439C7E471C7772C000D29859 = {
 						CreatedOnToolsVersion = 7.2.1;
-						DevelopmentTeam = RL7C49LAMC;
 						LastSwiftMigration = 1220;
-						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.HardenedRuntime = {
 								enabled = 1;
@@ -6865,6 +6870,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		AA11C0DE2F0010000000B001 /* Build HSBGSkip daemon */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Build HSBGSkip daemon";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/bin/sh \"${SRCROOT}/HSBGSkip/build-for-app.sh\"\n";
+		};
 		4368741F201720A800C9D1E9 /* Update version */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -7487,6 +7506,7 @@
 				B8DB12BF2EBAE910004268FA /* TinyRafaam.swift in Sources */,
 				439C7ECB1C777F8900D29859 /* LogReaderManager.swift in Sources */,
 				010B5360BE3F93FCA330D716 /* RewoundEntityCreationFilter.swift in Sources */,
+				AA11C0DE2F0010000000C002 /* PowerLogArchive.swift in Sources */,
 				B8815BF0302162F50016D77A /* ICopiesDeathrattlesProxy.swift in Sources */,
 				4B8A44DBE702C0F6C3BB0CA6 /* IDeathrattleProxy.swift in Sources */,
 				00861C0F306D142858D6A60E /* SneedsNewShredderProxy.swift in Sources */,
@@ -8334,6 +8354,7 @@
 				B8B7CC1F253C721400033758 /* BattlegroundsPreferences.swift in Sources */,
 				B89343422CD0791C009A8727 /* GalakrondCounter.swift in Sources */,
 				43C568011D5E584F00451B6F /* LogUploader.swift in Sources */,
+				AA11C0DE2F0010000000D002 /* ReplayUploadStore.swift in Sources */,
 				439C7EBD1C777F8900D29859 /* TagClass.swift in Sources */,
 				43E77EE41C94A19700C26950 /* TurnTimer.swift in Sources */,
 				B89865522D8C6FCB00BA5649 /* ChiaDrake.swift in Sources */,
@@ -8651,7 +8672,7 @@
 				B852D8332DDFB92C00884B26 /* CrushclawEnforcer.swift in Sources */,
 				B89343382CD00858009A8727 /* ChaoticTendrilCounter.swift in Sources */,
 				439C7E4C1C7772C000D29859 /* AppDelegate.swift in Sources */,
-				AA11C0DE2F0010000000A002 /* ClashSkipper.swift in Sources */,
+				AA11C0DE2F0010000000A002 /* SkipServiceController.swift in Sources */,
 				BB22C0DE2F0010000000B002 /* DisabledRacesPanel.swift in Sources */,
 				B846CCB82E1C5C9100552F9C /* Hybridization.swift in Sources */,
 				B852D82B2DDFB7DA00884B26 /* HighAbbessAlura.swift in Sources */,
@@ -9172,8 +9193,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = HSTracker/HSTracker.entitlements;
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = G92T24234W;
 				ENABLE_HARDENED_RUNTIME = YES;
 				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -9209,7 +9232,7 @@
 					"$(PROJECT_DIR)/downloaded-frameworks/mono/universal",
 					"$(SDKROOT)/usr/lib/swift",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 3.6.13;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CODE_SIGN_FLAGS = "--deep";
@@ -9218,7 +9241,7 @@
 					"-ld_classic",
 				);
 				OTHER_SWIFT_FLAGS = "-DDEBUG $(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = net.hearthsim.hstracker;
+				PRODUCT_BUNDLE_IDENTIFIER = net.hearthsim.wilfredwang19.hstracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_INCLUDE_PATHS = "";
@@ -9235,9 +9258,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = HSTracker/HSTracker.entitlements;
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = G92T24234W;
 				ENABLE_HARDENED_RUNTIME = YES;
 				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -9273,14 +9298,14 @@
 					"$(PROJECT_DIR)/downloaded-frameworks/mono/universal",
 					"$(SDKROOT)/usr/lib/swift",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 3.6.13;
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ld_classic",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = net.hearthsim.hstracker;
+				PRODUCT_BUNDLE_IDENTIFIER = net.hearthsim.wilfredwang19.hstracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -9325,7 +9350,7 @@
 					"@loader_path/../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/downloaded-frameworks/mono/runtimes/osx-x64/native";
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				OTHER_SWIFT_FLAGS = "-DHSTTEST";
 				PRODUCT_BUNDLE_IDENTIFIER = net.hearthsim.hstracker.HSTrackerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -9369,7 +9394,7 @@
 					"@loader_path/../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/downloaded-frameworks/mono/runtimes/osx-x64/native";
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				OTHER_SWIFT_FLAGS = "-DHSTTEST";
 				PRODUCT_BUNDLE_IDENTIFIER = net.hearthsim.hstracker.HSTrackerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
