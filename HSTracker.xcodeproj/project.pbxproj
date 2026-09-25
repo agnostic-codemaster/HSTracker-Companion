@@ -9249,7 +9249,7 @@
 					"-ld_classic",
 				);
 				OTHER_SWIFT_FLAGS = "-DDEBUG $(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = net.hearthsim.wilfredwang19.hstracker;
+				PRODUCT_BUNDLE_IDENTIFIER = net.hearthsim.hstracker.companion;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_INCLUDE_PATHS = "";
@@ -9313,7 +9313,7 @@
 					"$(inherited)",
 					"-ld_classic",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = net.hearthsim.wilfredwang19.hstracker;
+				PRODUCT_BUNDLE_IDENTIFIER = net.hearthsim.hstracker.companion;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_COMPILATION_MODE = wholemodule;
