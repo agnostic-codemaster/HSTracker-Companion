@@ -1,9 +1,9 @@
 # 同步原版 HSTracker
 
-本仓库的 `hsbg` 分支 = 原版 HSTracker 的某个版本 tag + CHS 保留的提交 + HSBG 整合提交。只跟随 `upstream`（HearthSim/HSTracker），不再跟随 `origin`（alamo68/HSTracker_CHS）。已开启 `rerere`，解决过的冲突会被记住。
+本仓库的 `main` 分支 = 原版 HSTracker 的某个版本 tag + CHS 保留的提交 + HSBG 整合提交。只跟随 `upstream`（HearthSim/HSTracker），不再跟随 `hstracker-chs`（alamo68/HSTracker_CHS）。同步后 `git push --force-with-lease origin main` 推回自己的仓库。已开启 `rerere`，解决过的冲突会被记住。
 
 ```sh
-git switch hsbg
+git switch main
 git status                          # 必须是干净的工作区
 git tag pre-<新版本> HEAD            # 回退点
 git fetch upstream --tags
