@@ -2550,7 +2550,7 @@ class Game: NSObject, PowerEventHandler {
                                                                    game: self )
 			
             let showUploadNotification = stats.gameMode == .practice || stats.gameMode == .arena || stats.gameMode == .brawl || stats.gameMode == .ranked || stats.gameMode == .friendly || stats.gameMode == .casual || stats.gameMode == .spectator || stats.gameMode == .duels
-            let archivedLines = PowerLogArchive.shared.latestMatchLines().filter { $0.contains("GameState.") }
+            let archivedLines = PowerLogArchive.shared.latestMatchLines(containing: "GameState.")
             // 只有拔线重连或对局中重启时才改用存档的原始日志；正常对局仍用 powerLog，
             // 这样上游 3.6.13 为 Semi-Stable Portal 回溯剔除的日志段不会被重新上传。
             let uploadLines = self.hasReconnected && archivedLines.contains(where: { $0.contains("CREATE_GAME") })
