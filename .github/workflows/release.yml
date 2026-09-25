@@ -1,0 +1,64 @@
+name: release
+
+# Pushing a tag like v3.6.13-companion.2 builds the app and attaches it to a draft
+# release, so the notes can be written and the build checked before it goes public.
+# Pull requests and manual runs build the same zip and keep it as a workflow artifact.
+on:
+  push:
+    tags: ["v*-companion.*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The Release build stamps CFBundleVersion with `git rev-list HEAD --count`.
+          fetch-depth: 0
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build
+        run: |
+          xcodebuild -project HSTracker.xcodeproj -scheme HSTracker -configuration Release \
+            -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build
+
+      - name: Package
+        id: package
+        run: |
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            version=${GITHUB_REF_NAME#v}
+          else
+            version=$(git describe --tags --always)-dev
+          fi
+          archive="build/HSTracker-Companion-${version}-macOS14-universal.zip"
+          app=build/DerivedData/Build/Products/Release/HSTracker.app
+
+          lipo -verify_arch arm64 x86_64 "$app/Contents/MacOS/HSTracker"
+          lipo -verify_arch arm64 x86_64 "$app/Contents/Resources/HSBGSkip/hsbgskipd"
+          Tools/package-local.sh "$app" "$archive"
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "archive=$archive" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HSTracker-Companion-${{ steps.package.outputs.version }}
+          path: ${{ steps.package.outputs.archive }}
+
+      - name: Draft release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          name: HSTracker Companion ${{ steps.package.outputs.version }}
+          draft: true
+          files: ${{ steps.package.outputs.archive }}
