@@ -119,7 +119,7 @@ class UploadMetaData: Encodable {
             metaData.format = format.toFormatType().rawValue
         }
         metaData.spectator_mode = stats.gameMode == .spectator
-        metaData.reconnecting = false //gameMetaData?.reconnected ?? false
+        metaData.reconnecting = game.hasReconnected
         metaData.resumable = stats.serverInfo?.resumable ?? false
         metaData.friendly_player = stats.friendlyPlayerId
         let scenarioId = stats.serverInfo?.mission ?? 0

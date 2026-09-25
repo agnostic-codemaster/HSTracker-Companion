@@ -1,146 +1,153 @@
-//
-//  LogUploader.swift
-//  HSTracker
-//
-//  Created by Benjamin Michotte on 12/08/16.
-//  Copyright © 2016 Benjamin Michotte. All rights reserved.
-//
-
+//  LogUploader.swift — © 2016 Benjamin Michotte. All rights reserved.
 import Foundation
 import Gzip
 import RealmSwift
 
 class LogUploader {
-    private static var inProgress: [UploaderItem] = []
-    
-    static func upload(logLines: [LogLine], buildNumber: Int, metaData: (metaData: UploadMetaData, statId: String )? = nil,
+    private static let lock = NSLock()
+    private static var inProgress = Set<String>()
+
+    static func upload(logLines: [LogLine], buildNumber: Int,
+                       metaData: (metaData: UploadMetaData, statId: String)? = nil,
                        gameStart: Date? = nil, fromFile: Bool = false,
                        completion: @escaping (UploadResult) -> Void) {
-        let log = logLines.sorted {
-            return $0.time < $1.time
-            }.map { $0.line }
-        upload(logLines: log, buildNumber: buildNumber, metaData: metaData, gameStart: gameStart,
+        upload(logLines: logLines.sorted { $0.time < $1.time }.map { $0.line },
+               buildNumber: buildNumber, metaData: metaData, gameStart: gameStart,
                fromFile: fromFile, completion: completion)
     }
 
-    static func upload(logLines: [String], buildNumber: Int, metaData: (metaData: UploadMetaData, statId: String )? = nil,
+    static func upload(logLines: [String], buildNumber: Int,
+                       metaData: (metaData: UploadMetaData, statId: String)? = nil,
                        gameStart: Date? = nil, fromFile: Bool = false,
+                       partialDueToReconnect: Bool = false,
                        completion: @escaping (UploadResult) -> Void) {
-        guard let token = Settings.hsReplayUploadToken else {
-            logger.error("HSReplay upload failed: Authorization token not set yet")
-            completion(.failed(error: "Authorization token not set yet"))
+        let id = metaData?.statId ?? UUID().uuidString
+        guard let candidate = candidate(from: logLines, reconnected: partialDueToReconnect) else {
+            reject(id: id, reason: "日志缺少 CREATE_GAME", completion: completion)
             return
         }
+        guard let info = metaData?.metaData, info.match_start != nil, info.game_type != nil else {
+            reject(id: id, reason: "缺少对局起点或上传元数据", completion: completion)
+            return
+        }
+        info.build = buildNumber
+        guard let encoded = try? JSONEncoder().encode(info) else {
+            reject(id: id, reason: "无法编码上传元数据", completion: completion)
+            return
+        }
+        // Reconnects can emit another CREATE_GAME. The raw archive stays intact;
+        // HSReplay receives the last usable suffix, explicitly marked partial.
+        let partial = candidate.partial
+        let log = candidate.log
+        ReplayUploadStore.shared.saveCandidate(id: id, metadata: encoded, log: log, partial: partial)
+        send(log: log, metadata: encoded, id: id, partial: partial,
+             statId: metaData?.statId, gameType: info.game_type,
+             deckId: info.player1?.deck_id ?? info.player2?.deck_id, completion: completion)
+    }
 
-        var lines = logLines
-        let numCreates = logLines.filter({ $0.contains("CREATE_GAME") }).count
-        if numCreates != 1 {
-            logger.error("HSReplay upload: Log contains none or multiple games (\(numCreates))")
-            // remove every line before _last_ create game
-            if let index = logLines.reversed().firstIndex(where: { $0.contains("CREATE_GAME") }) {
-                lines = logLines.reversed()[...index].reversed() as [String]
-            } else {
-                completion(.failed(error: "Log contains none or multiple games"))
-                return
+    static func candidate(from lines: [String], reconnected: Bool) -> (log: String, partial: Bool)? {
+        let creates = lines.indices.filter {
+            lines[$0].contains("GameState.DebugPrintPower()") && lines[$0].contains("CREATE_GAME")
+        }
+        guard let lastCreate = creates.last else { return nil }
+        return (lines[lastCreate...].joined(separator: "\n"), creates.count != 1 || reconnected)
+    }
+
+    static func retryableStatus(_ status: Int?) -> Bool {
+        guard let status else { return true }
+        return status == 429 || status >= 500
+    }
+
+    static func retryPending() {
+        for item in ReplayUploadStore.shared.retryCandidates() {
+            guard let metadata = item.metadata, let log = item.log else { continue }
+            HSReplayAPI.getUploadToken { _ in
+                send(log: log, metadata: metadata, id: item.id, partial: item.partial,
+                     statId: nil, gameType: nil, deckId: nil) { _ in }
             }
         }
-        
-        let log = lines.joined(separator: "\n")
-        if lines.isEmpty || log.trim().isEmpty {
-            logger.warning("Log file is empty, skipping")
-            completion(.failed(error: "Log file is empty"))
-            return
-        }
-        let item = UploaderItem(hash: log.hash)
-        if inProgress.contains(item) {
-            inProgress.append(item)
-            logger.info("\(item.hash) already in progress. Waiting for it to complete...")
-            completion(.failed(error:
-                "\(item.hash) already in progress. Waiting for it to complete..."))
-            return
-        }
-        
-        inProgress.append(item)
-
-        metaData?.metaData.build = buildNumber
-
-        guard let wrappedMetaData: Data = try? JSONEncoder().encode(metaData?.metaData) else {
-            logger.warning("Can not encode to json game metadata")
-            completion(.failed(error: "Can not encode to json game metadata"))
-            return
-        }
-//        logger.debug("Upload metadata: \(String(data: wrappedMetaData, encoding: .utf8) ?? "")")
-        logger.info("Uploading \(item.hash)")
-
-        let headers = [
-            "X-Api-Key": HSReplayAPI.apiKey,
-            "Authorization": "Token \(token)"
-        ]
-
-        let statId: String? = metaData?.statId
-
-        let http = Http(url: HSReplay.uploadRequestUrl)
-        http.json(method: .post,
-                  data: wrappedMetaData,
-                  headers: headers) { jsonData in
-
-                    guard let json = jsonData as? [String: Any],
-                        let putUrl = json["put_url"] as? String,
-                        let uploadShortId = json["shortid"] as? String,
-                        let replayUrl = json["url"] as? String
-                    else {
-                            logger.error("JSON Error : \(String(describing: jsonData))")
-                            let message = "Can not gzip : \(String(describing: jsonData))"
-                            completion(.failed(error: message))
-                            return
-                    }
-
-                    guard let data = log.data(using: .utf8) else {
-                        logger.error("Can not convert log to data")
-                        completion(.failed(error: "Can not convert log to data"))
-                        return
-                    }
-                    guard let gzip = try? data.gzipped() else {
-                        logger.error("Can not gzip log")
-                        completion(.failed(error: "Can not gzip log"))
-                        return
-                    }
-                    
-                    logger.info("putURL: \(putUrl), replayUrl: \(replayUrl), shortid: \(uploadShortId)")
-
-                    let http = Http(url: putUrl)
-                    http.upload(method: .put,
-                                headers: [
-                                    "Content-Type": "text/plain",
-                                    "Content-Encoding": "gzip"
-                        ],
-                                data: gzip)
-
-                    logger.info("\(item.hash) upload done: Success")
-                    inProgress = inProgress.filter({ $0.hash == item.hash })
-
-                    let gt = metaData?.metaData.game_type
-                    if gt != BnetGameType.bgt_battlegrounds.rawValue && gt != BnetGameType.bgt_battlegrounds_friendly.rawValue && gt != BnetGameType.bgt_mercenaries_pve.rawValue && gt != BnetGameType.bgt_mercenaries_pvp.rawValue && gt != BnetGameType.bgt_mercenaries_friendly.rawValue && gt != BnetGameType.bgt_mercenaries_pve_coop.rawValue {
-                        guard let statId = statId, let deckId = metaData?.metaData.player1?.deck_id ?? metaData?.metaData.player2?.deck_id,
-                              let existing = RealmHelper.getGameStat(deckId: deckId, with: statId)  else {
-                                        logger.error("Can not update statistic")
-                                        completion(.failed(error: "Can not update statistic"))
-                                        return
-                            }
-                            RealmHelper.update(stat: existing, hsReplayId: uploadShortId)
-                    }
-            
-                    completion(.successful(replayId: uploadShortId))
-        }
     }
-}
 
-private struct UploaderItem {
-    let hash: Int
-}
+    private static func reject(id: String, reason: String,
+                               completion: @escaping (UploadResult) -> Void) {
+        ReplayUploadStore.shared.saveCandidate(id: id, metadata: Data(), log: "", partial: true)
+        ReplayUploadStore.shared.finish(id: id, status: "被拒绝", detail: reason)
+        deliver(.failed(error: reason), completion: completion)
+    }
 
-extension UploaderItem: Equatable {
-    static func == (lhs: UploaderItem, rhs: UploaderItem) -> Bool {
-        return lhs.hash == rhs.hash
+    private static func deliver(_ result: UploadResult,
+                                completion: @escaping (UploadResult) -> Void) {
+        if Thread.isMainThread { completion(result) }
+        else { DispatchQueue.main.async { completion(result) } }
+    }
+
+    private static func send(log: String, metadata: Data, id: String, partial: Bool,
+                             statId: String?, gameType: Int?, deckId: Int64?,
+                             completion: @escaping (UploadResult) -> Void) {
+        lock.lock()
+        if inProgress.contains(id) {
+            lock.unlock()
+            deliver(.failed(error: "上传已经进行中"), completion: completion)
+            return
+        }
+        inProgress.insert(id)
+        lock.unlock()
+
+        func finish(_ result: UploadResult, status: String, detail: String, replayId: String? = nil) {
+            lock.lock()
+            inProgress.remove(id)
+            lock.unlock()
+            ReplayUploadStore.shared.finish(id: id, status: status, detail: detail, replayId: replayId)
+            deliver(result, completion: completion)
+        }
+
+        guard let token = Settings.hsReplayUploadToken else {
+            finish(.failed(error: "缺少上传授权"), status: "待重试", detail: "缺少上传授权")
+            return
+        }
+        let headers = ["X-Api-Key": HSReplayAPI.apiKey, "Authorization": "Token \(token)"]
+        var requestStatus: Int?
+        Http(url: HSReplay.uploadRequestUrl).json(method: .post, data: metadata, headers: headers,
+                                                  responseStatus: { requestStatus = $0 }) { response in
+            guard let json = response as? [String: Any] else {
+                let retry = retryableStatus(requestStatus)
+                finish(.failed(error: "上传请求失败"), status: retry ? "待重试" : "被拒绝",
+                       detail: requestStatus.map { "HTTP \($0)" } ?? "网络请求失败")
+                return
+            }
+            guard let putURL = json["put_url"] as? String,
+                  let shortID = json["shortid"] as? String,
+                  json["url"] as? String != nil else {
+                let reason = String(describing: json)
+                finish(.failed(error: reason), status: retryableStatus(requestStatus) ? "待重试" : "被拒绝", detail: reason)
+                return
+            }
+            guard let data = log.data(using: .utf8), let compressed = try? data.gzipped() else {
+                finish(.failed(error: "日志压缩失败"), status: "被拒绝", detail: "日志压缩失败")
+                return
+            }
+            Http(url: putURL).upload(method: .put,
+                                     headers: ["Content-Type": "text/plain", "Content-Encoding": "gzip"],
+                                     data: compressed) { success, error in
+                DispatchQueue.main.async {
+                    if success {
+                        let excluded: Set<Int> = [BnetGameType.bgt_battlegrounds.rawValue,
+                                                  BnetGameType.bgt_battlegrounds_friendly.rawValue,
+                                                  BnetGameType.bgt_mercenaries_pve.rawValue,
+                                                  BnetGameType.bgt_mercenaries_pvp.rawValue,
+                                                  BnetGameType.bgt_mercenaries_friendly.rawValue,
+                                                  BnetGameType.bgt_mercenaries_pve_coop.rawValue]
+                        if let gameType, !excluded.contains(gameType), let statId, let deckId,
+                           let stat = RealmHelper.getGameStat(deckId: deckId, with: statId) {
+                            RealmHelper.update(stat: stat, hsReplayId: shortID)
+                        }
+                        finish(.successful(replayId: shortID), status: partial ? "部分" : "完整",
+                               detail: "已上传：\(shortID)", replayId: shortID)
+                    } else {
+                        finish(.failed(error: error ?? "上传连接失败"), status: "待重试", detail: error ?? "上传连接失败")
+                    }
+                }
+            }
+        }
     }
 }

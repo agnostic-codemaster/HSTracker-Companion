@@ -12,26 +12,35 @@ import PromiseKit
 struct Http {
     let url: String
 
+    static func transportSummary(data: Data?, response: URLResponse?, error: Error?) -> String {
+        let status = (response as? HTTPURLResponse)?.statusCode
+        let failure = error.map { "\(($0 as NSError).domain):\(($0 as NSError).code)" } ?? "none"
+        return "status=\(status.map(String.init) ?? "none"), bytes=\(data?.count ?? 0), error=\(failure)"
+    }
+
     func json(method: HttpMethod,
               parameters: [String: Any] = [:],
               data: Data? = nil,
               headers: [String: String] = [:],
+              responseStatus: ((Int?) -> Void)? = nil,
               completion: @escaping (Any?) -> Void) {
         guard let urlRequest = prepareRequest(method: method,
                                               encoding: .json,
                                               data: data,
                                               parameters: parameters,
                                               headers: headers) else {
+                                                responseStatus?(nil)
                                                 completion(nil)
                                                 return
         }
 
         Http.session.dataTask(with: urlRequest) { data, response, error in
-            logger.info("Fetching \(self.url) complete")
+            logger.info("Fetching \(urlRequest.url?.host ?? "unknown host") complete")
 
             if let error = error {
-                logger.error("request error : \(error)")
+                logger.error("request error: \(Self.transportSummary(data: data, response: response, error: error))")
                 DispatchQueue.main.async {
+                    responseStatus?((response as? HTTPURLResponse)?.statusCode)
                     completion(nil)
                 }
                 return
@@ -40,19 +49,21 @@ struct Http {
                     let json = try JSONSerialization.jsonObject(with: data,
                                                                 options: .allowFragments)
                     DispatchQueue.main.async {
+                        responseStatus?((response as? HTTPURLResponse)?.statusCode)
                         completion(json)
                     }
                     return
                 } catch let error {
                     logger.error("json parsing : \(error)")
                     DispatchQueue.main.async {
+                        responseStatus?((response as? HTTPURLResponse)?.statusCode)
                         completion(nil)
                     }
                 }
             } else {
-                logger.error("\(#function): \(String(describing: error)), "
-                    + "\(String(describing: data)), \(String(describing: response))")
+                logger.error("\(#function): \(Self.transportSummary(data: data, response: response, error: error))")
                 DispatchQueue.main.async {
+                    responseStatus?((response as? HTTPURLResponse)?.statusCode)
                     completion(nil)
                 }
             }
@@ -74,16 +85,13 @@ struct Http {
             Http.session.uploadTask(with: urlRequest,
                                     from: data) { data, response, error in
                 if let error = error {
-                    logger.error("request error : \(error)")
+                    logger.error("request error: \(Self.transportSummary(data: data, response: response, error: error))")
                     seal.reject(error)
                 } else if let data = data {
-                    logger.verbose("upload result : \(data)")
+                    logger.verbose("upload result: \(data.count) bytes")
                     seal.fulfill(data)
                 }
-                logger.debug("p \(#function): "
-                                + "\(String(describing: error)), "
-                                + "data: \(String(describing: data)), "
-                                + "response: \(String(describing: response))")
+                logger.debug("p \(#function): \(Self.transportSummary(data: data, response: response, error: error))")
             }.resume()
         }
     }
@@ -139,42 +147,41 @@ struct Http {
 
             Http.session.dataTask(with: urlRequest) { data, response, error in
                 if let error = error {
-                    logger.error("request error : \(error)")
+                    logger.error("request error: \(Self.transportSummary(data: data, response: response, error: error))")
                     seal.reject(error)
                 } else if let data = data {
-                    logger.verbose("get result : \(data)")
+                    logger.verbose("get result: \(data.count) bytes")
                     seal.fulfill(data)
                 }
-                logger.debug("p \(#function): "
-                                + "\(String(describing: error)), "
-                                + "data: \(String(describing: data)), "
-                                + "response: \(String(describing: response))")
+                logger.debug("p \(#function): \(Self.transportSummary(data: data, response: response, error: error))")
             }.resume()
         }
     }
 
     func upload(method: HttpMethod,
                 headers: [String: String] = [:],
-                data: Data) {
+                data: Data,
+                completion: ((Bool, String?) -> Void)? = nil) {
         guard let urlRequest = prepareRequest(method: method,
                                               encoding: .multipart,
                                               parameters: [:],
                                               headers: headers) else {
+                                                completion?(false, "invalid upload URL")
                                                 return
         }
 
         Http.session.uploadTask(with: urlRequest,
                                 from: data) { data, response, error in
                                     if let error = error {
-                                        logger.error("request error : \(error)")
+                                        logger.error("request error: \(Self.transportSummary(data: data, response: response, error: error))")
                                     } else if let data = data {
-                                        logger.verbose("upload result : \(data)")
+                                        logger.verbose("upload result: \(data.count) bytes")
                                     }
                                     
-                                    logger.debug("\(#function): "
-                                            + "\(String(describing: error)), "
-                                            + "data: \(String(describing: data)), "
-                                            + "response: \(String(describing: response))")
+                                    logger.debug("\(#function): \(Self.transportSummary(data: data, response: response, error: error))")
+                                    let code = (response as? HTTPURLResponse)?.statusCode
+                                    let success = error == nil && code.map { (200..<300).contains($0) } == true
+                                    completion?(success, error?.localizedDescription ?? code.map { "HTTP \($0)" })
                                     
             }.resume()
     }
