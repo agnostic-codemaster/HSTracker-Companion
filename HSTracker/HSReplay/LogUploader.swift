@@ -35,22 +35,27 @@ class LogUploader {
             reject(id: id, reason: "无法编码上传元数据", completion: completion)
             return
         }
-        // Reconnects can emit another CREATE_GAME. The raw archive stays intact;
-        // HSReplay receives the last usable suffix, explicitly marked partial.
+        // 拔线重连会让日志里出现多个 CREATE_GAME。优先把各段拼接成一局上传；
+        // 拼接失败时才退回只上传最后一段，并标记为部分上传。
         let partial = candidate.partial
         let log = candidate.log
         ReplayUploadStore.shared.saveCandidate(id: id, metadata: encoded, log: log, partial: partial)
-        send(log: log, metadata: encoded, id: id, partial: partial,
+        send(log: log, metadata: encoded, id: id, partial: partial, stitched: candidate.stitched,
              statId: metaData?.statId, gameType: info.game_type,
              deckId: info.player1?.deck_id ?? info.player2?.deck_id, completion: completion)
     }
 
-    static func candidate(from lines: [String], reconnected: Bool) -> (log: String, partial: Bool)? {
+    static func candidate(from lines: [String],
+                          reconnected: Bool) -> (log: String, partial: Bool, stitched: Int)? {
         let creates = lines.indices.filter {
             lines[$0].contains("GameState.DebugPrintPower()") && lines[$0].contains("CREATE_GAME")
         }
-        guard let lastCreate = creates.last else { return nil }
-        return (lines[lastCreate...].joined(separator: "\n"), creates.count != 1 || reconnected)
+        guard let firstCreate = creates.first, let lastCreate = creates.last else { return nil }
+        if creates.count > 1,
+           let stitched = ReconnectLogStitcher.stitch(Array(lines[firstCreate...])) {
+            return (stitched.lines.joined(separator: "\n"), true, stitched.reconnects)
+        }
+        return (lines[lastCreate...].joined(separator: "\n"), creates.count != 1 || reconnected, 0)
     }
 
     static func retryableStatus(_ status: Int?) -> Bool {
@@ -81,7 +86,7 @@ class LogUploader {
         else { DispatchQueue.main.async { completion(result) } }
     }
 
-    private static func send(log: String, metadata: Data, id: String, partial: Bool,
+    private static func send(log: String, metadata: Data, id: String, partial: Bool, stitched: Int = 0,
                              statId: String?, gameType: Int?, deckId: Int64?,
                              completion: @escaping (UploadResult) -> Void) {
         lock.lock()
@@ -141,8 +146,10 @@ class LogUploader {
                            let stat = RealmHelper.getGameStat(deckId: deckId, with: statId) {
                             RealmHelper.update(stat: stat, hsReplayId: shortID)
                         }
-                        finish(.successful(replayId: shortID), status: partial ? "部分" : "完整",
-                               detail: "已上传：\(shortID)", replayId: shortID)
+                        let status = stitched > 0 ? "已拼接" : (partial ? "部分" : "完整")
+                        let note = stitched > 0 ? "（拼接 \(stitched) 次重连）" : ""
+                        finish(.successful(replayId: shortID), status: status,
+                               detail: "已上传：\(shortID)\(note)", replayId: shortID)
                     } else {
                         finish(.failed(error: error ?? "上传连接失败"), status: "待重试", detail: error ?? "上传连接失败")
                     }
