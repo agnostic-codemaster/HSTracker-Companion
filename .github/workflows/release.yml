@@ -1,11 +1,12 @@
 name: release
 
-# Pushing a tag like v3.6.13-companion.2 builds the app and attaches it to a draft
-# release, so the notes can be written and the build checked before it goes public.
+# Pushing a tag like v3.6.13-companion or v3.6.13-companion-fix1 builds the app and
+# attaches it to a draft release, so the notes can be written and the build checked
+# before it goes public.
 # Pull requests and manual runs build the same zip and keep it as a workflow artifact.
 on:
   push:
-    tags: ["v*-companion.*"]
+    tags: ["v*-companion*"]
   pull_request:
     branches: [main]
   workflow_dispatch:
