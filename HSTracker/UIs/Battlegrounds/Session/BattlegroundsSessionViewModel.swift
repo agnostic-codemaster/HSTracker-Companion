@@ -492,7 +492,7 @@ class BattlegroundsSessionViewModel: ObservableObject {
         let sortedGames = BattlegroundsLastGames.instance.getPlayerGames(duos: duos).sorted(by: { (a, b) in a.startTime < b.startTime })
         deleteOldGames(games: sortedGames)
         var games = getSessionGames(sortedGames: sortedGames, ratingInfo: ratingInfo, duos: duos)
-        let firstGame = games.first
+        let firstGame = games.first(where: { !$0.isIncomplete })
         if games.count > 8 {
             games.removeSubrange(0 ..< games.count - 8)
         }
@@ -519,14 +519,14 @@ class BattlegroundsSessionViewModel: ObservableObject {
             if let previousGameEndTime = previousGameEndTime {
                 let gStartTime = g.startTime
                 let ts = gStartTime.timeIntervalSince(previousGameEndTime)
-                let ratingReset = BattlegroundsLastGames.isRatingReset(before: previousGameRatingAfter, after: g.rating)
+                let ratingReset = !g.isIncomplete && BattlegroundsLastGames.isRatingReset(before: previousGameRatingAfter, after: g.rating)
 
                 if ts / 3600 >= 6 || ratingReset {
                     sessionStartTime = gStartTime
                 }
             }
             previousGameEndTime = g.endTime
-            previousGameRatingAfter = g.ratingAfter
+            if !g.isIncomplete { previousGameRatingAfter = g.ratingAfter }
         }
 
         var sessionGames = [BattlegroundsLastGames.GameItem]()
@@ -539,7 +539,7 @@ class BattlegroundsSessionViewModel: ObservableObject {
             // Check for MMR reset on last game
             var ratingResetAfterLastGame = false
             if let currentMMR = BattlegroundsSessionViewModel.clientRating(ratingInfo: ratingInfo, duos: duos) {
-                ratingResetAfterLastGame = BattlegroundsLastGames.isRatingReset(before: lastGame.ratingAfter, after: currentMMR)
+                ratingResetAfterLastGame = !lastGame.isIncomplete && BattlegroundsLastGames.isRatingReset(before: lastGame.ratingAfter, after: currentMMR)
             }
             if Date().timeIntervalSince(lastGame.endTime) >= 6 * 60 * 60 || ratingResetAfterLastGame {
                 return []

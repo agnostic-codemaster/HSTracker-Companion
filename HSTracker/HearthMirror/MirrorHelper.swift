@@ -16,17 +16,22 @@ struct MirrorHelper {
     
     /** Internal represenation of the mirror object, do not access it directly */
     private static var _mirror: HearthMirror?
+    private static var taskportRightRequested = false
+    private static var nextMirrorAttempt = Date.distantPast
     
     private static let accessQueue = DispatchQueue(label: "net.hearthsim.hstracker.mirrorQueue", attributes: [])
     
     private static var mirror: HearthMirror? {
         
-        if MirrorHelper._mirror == nil {
+        if MirrorHelper._mirror == nil && Date() >= nextMirrorAttempt {
             // disable until we can fix memory reading
             if let hsApp = CoreManager.hearthstoneApp {
                 logger.verbose("Initializing HearthMirror with pid \(hsApp.processIdentifier)")
                 
                 MirrorHelper._mirror = MirrorHelper.initMirror(pid: hsApp.processIdentifier, blocking: false)
+                if MirrorHelper._mirror == nil {
+                    nextMirrorAttempt = Date().addingTimeInterval(5)
+                }
             } else {
                 //logger.error("Failed to initialize HearthMirror: game is not running")
             }
@@ -36,10 +41,13 @@ struct MirrorHelper {
     }
     
     private static func initMirror(pid: Int32, blocking: Bool) -> HearthMirror? {
-        
-        // get rights to attach
-        if acquireTaskportRight() != 0 {
-            logger.error("acquireTaskportRight() failed!")
+        // The authorization belongs to this process. Repeating this call on every
+        // mirror retry can show the system permission dialog over and over.
+        if !taskportRightRequested {
+            taskportRightRequested = true
+            if acquireTaskportRight() != 0 {
+                logger.error("acquireTaskportRight() failed!")
+            }
         }
         
         let mirror = HearthMirror(pid: pid,
@@ -70,6 +78,7 @@ struct MirrorHelper {
         logger.verbose("Deinitializing mirror")
         MirrorHelper.accessQueue.sync {
             MirrorHelper._mirror = nil
+            nextMirrorAttempt = .distantPast
         }
     }
     
@@ -464,11 +473,41 @@ struct MirrorHelper {
     }
     
     static func getLogSessionDir() -> String {
+        // Log tracking must not depend on memory-reading permission. HearthMirror
+        // can fail to attach on a new macOS release even while Hearthstone is
+        // writing perfectly usable Power and LoadingScreen logs.
+        if let app = CoreManager.hearthstoneApp,
+           let bundle = app.bundleURL,
+           let launchDate = app.launchDate {
+            let logsRoot = bundle.deletingLastPathComponent().appendingPathComponent("Logs")
+            if FileManager.default.fileExists(atPath: logsRoot.path) {
+                return latestLogSessionDir(in: logsRoot, launchedAfter: launchDate) ?? ""
+            }
+        }
         var result: String?
         MirrorHelper.accessQueue.sync {
             result = mirror?.getLogSessionDir()
         }
         return result ?? ""
+    }
+
+    static func latestLogSessionDir(in logsRoot: URL, launchedAfter launchDate: Date) -> String? {
+        let fileManager = FileManager.default
+        guard let names = try? fileManager.contentsOfDirectory(atPath: logsRoot.path) else {
+            return nil
+        }
+        for name in names.filter({ $0.hasPrefix("Hearthstone_") }).sorted().reversed() {
+            let directory = logsRoot.appendingPathComponent(name, isDirectory: true)
+            guard let attributes = try? fileManager.attributesOfItem(atPath: directory.path),
+                  let created = attributes[.creationDate] as? Date,
+                  created >= launchDate.addingTimeInterval(-5) else { continue }
+            if ["Power.log", "LoadingScreen.log", "Hearthstone.log"].contains(where: {
+                fileManager.fileExists(atPath: directory.appendingPathComponent($0).path)
+            }) {
+                return directory.path
+            }
+        }
+        return nil
     }
     
     static func getDeckPickerDecksOnPage() -> [MirrorCollectionDeckBoxVisual?] {
@@ -631,4 +670,3 @@ struct MirrorHelper {
         return result
     }
 }
-

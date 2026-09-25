@@ -43,12 +43,14 @@ class BattlegroundsGameRowViewModel: ObservableObject, Identifiable, Equatable {
 
     private let duos: Bool
     private let friendlyGame: Bool
+    private let incomplete: Bool
 
     init(gameItem: BattlegroundsLastGames.GameItem) {
         startTime = gameItem.startTime
         placement = gameItem.placement
         duos = gameItem.duos ?? false
         friendlyGame = gameItem.friendlyGame ?? false
+        incomplete = gameItem.isIncomplete
 
         var card = Cards.by(cardId: gameItem.hero)
         if let parentId = card?.battlegroundsSkinParentId, parentId > 0 {
@@ -56,7 +58,9 @@ class BattlegroundsGameRowViewModel: ObservableObject, Identifiable, Equatable {
         }
         heroCard = card
 
-        if Self.preferTranslatedCardName {
+        if gameItem.isIncomplete && gameItem.hero.isEmpty {
+            heroName = "未知英雄（不完整）"
+        } else if Self.preferTranslatedCardName {
             // Some languages have short card names, so we'd rather use the language from the game than our English-only short version.
             heroName = card?.name ?? "-"
         } else {
@@ -67,9 +71,9 @@ class BattlegroundsGameRowViewModel: ObservableObject, Identifiable, Equatable {
         mmrDelta = gameItem.seasonReset ? gameItem.ratingAfter : gameItem.ratingAfter - gameItem.rating
         let signal = mmrDelta > 0 ? "+" : ""
         let unknownDelta = abs(mmrDelta) > Self.maxPlausibleMMRDelta || friendlyGame
-        mmrDeltaText = unknownDelta ? "-" : "\(signal)\(mmrDelta)"
+        mmrDeltaText = gameItem.isIncomplete ? "未知" : (unknownDelta ? "-" : "\(signal)\(mmrDelta)")
 
-        showCrown = gameItem.placement == 1
+        showCrown = !gameItem.isIncomplete && gameItem.placement == 1
 
         finalBoardMinions = gameItem.finalBoard?.minions.map { minion in
             let entity = Entity()
@@ -84,10 +88,13 @@ class BattlegroundsGameRowViewModel: ObservableObject, Identifiable, Equatable {
     }
 
     var placementText: String {
-        String.localizedString("Battlegrounds_Game_Ordinal_\(placement)", comment: "")
+        guard placement > 0 else { return "未知（不完整）" }
+        let text = String.localizedString("Battlegrounds_Game_Ordinal_\(placement)", comment: "")
+        return incomplete ? "\(text)（不完整）" : text
     }
 
     var placementColor: Color {
+        guard placement > 0 else { return .white }
         let win = duos ? placement <= 2 : placement <= 4
         return win ? BattlegroundsSessionColors.placementLow : BattlegroundsSessionColors.placementHigh
     }

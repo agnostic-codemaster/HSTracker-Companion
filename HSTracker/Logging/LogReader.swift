@@ -30,6 +30,7 @@ final class LogReader {
 		
         self.path = "\(logPath)/\(info.name.rawValue).log"
         logger.info("Init reader for \(info.name) at path \(self.path)")
+        if info.name == .power { PowerLogArchive.shared.capture(path: self.path) }
         if fileManager.fileExists(atPath: self.path)
                    && !FileUtils.isFileOpen(byHearthstone: self.path)
 					&& removeLogfile {
@@ -99,6 +100,7 @@ final class LogReader {
             // autoreleased temporary the read and the parsing produce piles up
             // for the whole session.
             autoreleasepool {
+                if info.name == .power { PowerLogArchive.shared.capture(path: path) }
                 if fileHandle == nil && fileManager.fileExists(atPath: path) {
                     fileHandle = FileHandle(forReadingAtPath: path)
 
@@ -172,6 +174,7 @@ final class LogReader {
         
         // try to truncate log file when stopping
         if fileManager.fileExists(atPath: path) && eraseFile {
+            if info.name == .power { PowerLogArchive.shared.capture(path: path) }
             let file = FileHandle(forWritingAtPath: path)
             if #available(macOS 10.15.4, *) {
                 try? file?.truncate(atOffset: 0)

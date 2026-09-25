@@ -1275,6 +1275,7 @@ class Game: NSObject, PowerEventHandler {
     private var _mercenariesRating: Int?
     
     private var isReconnect = false
+    var hasReconnected: Bool { isReconnect }
     var shouldSuppressLog: Bool {
         return isBattlegroundsMatch() && isReconnect
     }
@@ -2132,6 +2133,7 @@ class Game: NSObject, PowerEventHandler {
             logger.info("Reconnect sync: gameType=\(self.currentGameType) "
                 + "isBG=\(self.isBattlegroundsMatch()) "
                 + "playerId=\(self.player.id) opponentId=\(self.opponent.id)")
+            self.isReconnect = true
             
             if self.isTraditionalHearthstoneMatch {
                 CardLegalityChecker.loadCardsByFormat(gameType: self.currentGameType, format: self.currentFormatType)
@@ -2140,7 +2142,6 @@ class Game: NSObject, PowerEventHandler {
             
             if self.isBattlegroundsMatch() {
                 if (self.gameEntity?[.step] ?? 0) > Step.begin_mulligan.rawValue {
-                    self.isReconnect = true
                     DispatchQueue.main.async {
                         self.updateBattlegroundsSessionPanel()
                     }
@@ -2549,10 +2550,14 @@ class Game: NSObject, PowerEventHandler {
                                                                    game: self )
 			
             let showUploadNotification = stats.gameMode == .practice || stats.gameMode == .arena || stats.gameMode == .brawl || stats.gameMode == .ranked || stats.gameMode == .friendly || stats.gameMode == .casual || stats.gameMode == .spectator || stats.gameMode == .duels
+            let archivedLines = PowerLogArchive.shared.latestMatchLines().filter { $0.contains("GameState.") }
+            let uploadLines = archivedLines.contains(where: { $0.contains("CREATE_GAME") })
+                ? archivedLines : logLines.sorted { $0.time < $1.time }.map { $0.line }
             HSReplayAPI.getUploadToken { _ in
                 
-                LogUploader.upload(logLines: logLines, buildNumber: self.buildNumber,
-                                   metaData: (uploadMetaData, statId)) { result in
+                LogUploader.upload(logLines: uploadLines, buildNumber: self.buildNumber,
+                                   metaData: (uploadMetaData, statId),
+                                   partialDueToReconnect: self.hasReconnected) { result in
                     if case UploadResult.successful(let replayId) = result {
                         if stats.gameMode == .battlegrounds {
                             Sentry.sendQueuedBobsBuddyEvents(shortId: replayId)
@@ -2580,13 +2585,14 @@ class Game: NSObject, PowerEventHandler {
     }
     
     private class PendingBattlegroundsGame {
-        init(stats: InternalGameStats, heroCardId: String, placement: Int, finalBoard: [Entity], friendlyGame: Bool, duos: Bool) {
+        init(stats: InternalGameStats, heroCardId: String, placement: Int, finalBoard: [Entity], friendlyGame: Bool, duos: Bool, incomplete: Bool) {
             self.stats = stats
             self.heroCardId = heroCardId
             self.placement = placement
             self.finalBoard = finalBoard
             self.friendlyGame = friendlyGame
             self.duos = duos
+            self.incomplete = incomplete
         }
         
         let stats: InternalGameStats
@@ -2595,6 +2601,7 @@ class Game: NSObject, PowerEventHandler {
         let finalBoard: [Entity]
         let friendlyGame: Bool
         let duos: Bool
+        let incomplete: Bool
     }
 
     // Capture entity-derived data before the SaveReplays await, since a return to menu or
@@ -2610,15 +2617,13 @@ class Game: NSObject, PowerEventHandler {
         let heroCardId = hero?.cardId != nil ? BattlegroundsUtils.getOriginalHeroId(heroId: hero?.cardId ?? "") : nil
         let duos = isBattlegroundsDuosMatch()
         let placement = min(hero?[.player_leaderboard_place] ?? 0, duos ? 4 : 8)
-        guard let heroCardId, placement > 0 else {
-            logger.error("Missing data while trying to record battleground game")
-            return
-        }
+        let incomplete = heroCardId == nil || placement <= 0
+        if incomplete { logger.warning("Battlegrounds result is incomplete; keeping the match with unknown fields") }
         let finalBoard = entities.values.filter({ x in x.isMinion && x.isInZone(zone: .play) && x.isControlled(by: player.id)}).compactMap({ x in x.copy() }).sorted(by: { x, y in
             x[.zone_position] < y[.zone_position]
         })
         let friendlyGame = currentGameType == .gt_battlegrounds_friendly || currentGameType == .gt_battlegrounds_duo_friendly
-        _pendingBattlegroundsGame = PendingBattlegroundsGame(stats: stats, heroCardId: heroCardId, placement: placement, finalBoard: finalBoard, friendlyGame: friendlyGame, duos: duos)
+        _pendingBattlegroundsGame = PendingBattlegroundsGame(stats: stats, heroCardId: heroCardId ?? "", placement: placement, finalBoard: finalBoard, friendlyGame: friendlyGame, duos: duos, incomplete: incomplete)
     }
     
     // Persist the captured game once SaveReplays has populated the post-game rating.
@@ -2627,7 +2632,8 @@ class Game: NSObject, PowerEventHandler {
             return
         }
         _pendingBattlegroundsGame = nil
-        BattlegroundsLastGames.instance.addGame(startTime: pending.stats.startTime, endTime: pending.stats.endTime, hero: pending.heroCardId, rating: pending.stats.battlegroundsRating, ratingAfter: pending.stats.battlegroundsRatingAfter, placement: pending.placement, finalBoard: pending.finalBoard, friendlyGame: pending.friendlyGame, duos: pending.duos)
+        let ratingUnknown = !pending.friendlyGame && pending.stats.battlegroundsRating == 0 && pending.stats.battlegroundsRatingAfter == 0
+        BattlegroundsLastGames.instance.addGame(startTime: pending.stats.startTime, endTime: pending.stats.endTime, hero: pending.heroCardId, rating: pending.stats.battlegroundsRating, ratingAfter: pending.stats.battlegroundsRatingAfter, placement: pending.placement, finalBoard: pending.finalBoard, friendlyGame: pending.friendlyGame, duos: pending.duos, incomplete: pending.incomplete || ratingUnknown)
         updateBattlegroundsSessionPanel()
     }
 

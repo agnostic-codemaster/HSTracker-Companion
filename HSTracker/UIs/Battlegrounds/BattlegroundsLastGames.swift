@@ -25,13 +25,17 @@ class BattlegroundsLastGames: Codable {
         var finalBoard: FinalBoardItem?
         var friendlyGame: Bool?
         var duos: Bool?
+        // Optional for compatibility with existing BgsLastGames.json files.
+        var incomplete: Bool?
+
+        var isIncomplete: Bool { incomplete == true || hero.isEmpty || placement <= 0 }
 
         // the season reset happened during this game, so it counts as starting from 0 MMR
         var seasonReset: Bool {
-            return BattlegroundsLastGames.isRatingReset(before: rating, after: ratingAfter)
+            return !isIncomplete && BattlegroundsLastGames.isRatingReset(before: rating, after: ratingAfter)
         }
 
-        init(startTime: Date, endTime: Date, hero: String, rating: Int, ratingAfter: Int, placement: Int, finalBoard: [Entity], friendlyGame: Bool, player: String, duos: Bool) {
+        init(startTime: Date, endTime: Date, hero: String, rating: Int, ratingAfter: Int, placement: Int, finalBoard: [Entity], friendlyGame: Bool, player: String?, duos: Bool, incomplete: Bool) {
             self.startTime = startTime
             self.endTime = endTime
             self.hero = hero
@@ -42,6 +46,7 @@ class BattlegroundsLastGames: Codable {
             self.friendlyGame = friendlyGame
             self.player = player
             self.duos = duos
+            self.incomplete = incomplete
         }
     }
     
@@ -116,19 +121,14 @@ class BattlegroundsLastGames: Codable {
     }
     
     func getPlayerGames(duos: Bool) -> [GameItem] {
-        guard let playerId = getPlayerId() else {
-            return [GameItem]()
-        }
+        let playerId = getPlayerId()
         return games.filter { g in (g.player == nil || g.player == playerId) && (g.duos == duos || (g.duos == nil && !duos)) }
     }
     
-    func addGame(startTime: Date, endTime: Date, hero: String, rating: Int, ratingAfter: Int, placement: Int, finalBoard: [Entity], friendlyGame: Bool, duos: Bool, save: Bool = true) {
-        guard let playerId = getPlayerId() else {
-            logger.info("Unable to save the game. User account can not found...")
-            return
-        }
+    func addGame(startTime: Date, endTime: Date, hero: String, rating: Int, ratingAfter: Int, placement: Int, finalBoard: [Entity], friendlyGame: Bool, duos: Bool, incomplete: Bool = false, save: Bool = true) {
+        let playerId = getPlayerId()
         removeGame(startTime: startTime, save: false)
-        games.append(GameItem(startTime: startTime, endTime: endTime, hero: hero, rating: rating, ratingAfter: ratingAfter, placement: placement, finalBoard: finalBoard, friendlyGame: friendlyGame, player: playerId, duos: duos))
+        games.append(GameItem(startTime: startTime, endTime: endTime, hero: hero, rating: rating, ratingAfter: ratingAfter, placement: placement, finalBoard: finalBoard, friendlyGame: friendlyGame, player: playerId, duos: duos, incomplete: incomplete || playerId == nil))
         if save {
             self.save()
         }
