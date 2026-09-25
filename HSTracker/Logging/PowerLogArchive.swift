@@ -75,43 +75,91 @@ final class PowerLogArchive {
 
     /// The final segment can contain several CREATE_GAME lines after reconnect.
     /// Preserve it in full; the uploader may choose a usable suffix separately.
-    func latestMatchLines() -> [String] {
+    ///
+    /// The archive covers a whole Hearthstone session and can run to tens of megabytes.
+    /// Decoding all of it into strings at game end cost hundreds of megabytes that were
+    /// never returned, so a first pass locates the latest match on raw bytes, and only
+    /// that match is decoded, keeping just the lines that contain `filter`.
+    func latestMatchLines(containing filter: String? = nil) -> [String] {
         lock.lock()
         defer { lock.unlock() }
-        guard let name = cursor?.archiveName,
-              let input = try? FileHandle(forReadingFrom: directory.appendingPathComponent(name)) else { return [] }
-        defer { try? input.close() }
+        guard let name = cursor?.archiveName else { return [] }
+        let url = directory.appendingPathComponent(name)
+        guard let start = latestMatchOffset(in: url) else { return [] }
         var matchLines: [String] = []
-        var pending = Data()
-        var started = false
-        var completed = false
-
-        func process(_ bytes: Data) {
+        forEachLine(in: url, from: start) { bytes, _ in
             let line = String(decoding: bytes, as: UTF8.self).trimmingCharacters(in: .newlines)
-            let create = line.contains("GameState.DebugPrintPower()") && line.contains("CREATE_GAME")
-            if create && completed {
-                matchLines.removeAll(keepingCapacity: true)
-                completed = false
+            if !line.isEmpty && (filter.map { line.contains($0) } ?? true) {
+                matchLines.append(line)
             }
-            if create { started = true }
-            if started && !line.isEmpty { matchLines.append(line) }
-            if started && line.contains("tag=STATE value=COMPLETE") { completed = true }
         }
+        return matchLines
+    }
 
-        do {
-            while let chunk = try input.read(upToCount: 1_048_576), !chunk.isEmpty {
-                let parts = chunk.split(separator: 0x0A, omittingEmptySubsequences: false)
-                for part in parts.dropLast() {
-                    pending.append(contentsOf: part)
-                    process(pending)
-                    pending.removeAll(keepingCapacity: true)
+    private static let gameStateMarker = Data("GameState.DebugPrintPower()".utf8)
+    private static let createGameMarker = Data("CREATE_GAME".utf8)
+    private static let completeMarker = Data("tag=STATE value=COMPLETE".utf8)
+
+    /// Offset of the CREATE_GAME line that opens the latest match. A CREATE_GAME starts a
+    /// new match only after the previous one reached COMPLETE; before that it is a
+    /// reconnect inside the same match.
+    private func latestMatchOffset(in url: URL) -> UInt64? {
+        var start: UInt64?
+        var completed = false
+        forEachLine(in: url, from: 0) { bytes, offset in
+            if bytes.range(of: Self.createGameMarker) != nil && bytes.range(of: Self.gameStateMarker) != nil {
+                if start == nil || completed {
+                    start = offset
+                    completed = false
                 }
-                if let last = parts.last { pending.append(contentsOf: last) }
+            } else if start != nil && bytes.range(of: Self.completeMarker) != nil {
+                completed = true
+            }
+        }
+        return start
+    }
+
+    /// Calls `body` with each newline-terminated line, without its newline, and the offset
+    /// the line starts at. A trailing line still being written is skipped.
+    private func forEachLine(in url: URL, from start: UInt64, _ body: (Data, UInt64) -> Void) {
+        guard let input = try? FileHandle(forReadingFrom: url) else { return }
+        defer { try? input.close() }
+        var pending = Data()
+        var lineStart = start
+        do {
+            try input.seek(toOffset: start)
+            var reachedEnd = false
+            while !reachedEnd {
+                // The read must happen inside the pool: each chunk comes back autoreleased,
+                // and outside it every chunk of the file stays alive until the caller's pool
+                // drains — as much memory as the archive is large.
+                try autoreleasepool {
+                    guard let chunk = try input.read(upToCount: 1_048_576), !chunk.isEmpty else {
+                        reachedEnd = true
+                        return
+                    }
+                    var index = chunk.startIndex
+                    while let newline = chunk[index...].firstIndex(of: 0x0A) {
+                        let length: Int
+                        if pending.isEmpty {
+                            let line = chunk[index..<newline]
+                            length = line.count
+                            body(line, lineStart)
+                        } else {
+                            pending.append(chunk[index..<newline])
+                            length = pending.count
+                            body(pending, lineStart)
+                            pending.removeAll()
+                        }
+                        lineStart += UInt64(length + 1)
+                        index = chunk.index(after: newline)
+                    }
+                    pending.append(chunk[index...])
+                }
             }
         } catch {
             logger.error("Could not read archived Power log: \(error)")
         }
-        return matchLines
     }
 
     private func saveCursor() {
