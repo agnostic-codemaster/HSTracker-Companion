@@ -52,7 +52,8 @@ struct BattlegroundsSessionView: View {
     @ViewBuilder
     private var finalBoardTooltip: some View {
         if let hovered = viewModel.hoveredGame {
-            FinalBoardTooltipContainer(minions: hovered.viewModel.finalBoardMinions,
+            FinalBoardTooltipContainer(gameId: hovered.viewModel.id,
+                                       minions: hovered.viewModel.finalBoardMinions,
                                        tooltipToRight: viewModel.tooltipToRight,
                                        origin: CGPoint(x: hovered.frame.minX, y: hovered.frame.minY))
                 .allowsHitTesting(false)
@@ -362,6 +363,7 @@ struct BattlegroundsSessionView: View {
 // opens to the left - can be held in @State without that state living on the
 // whole panel.
 private struct FinalBoardTooltipContainer: View {
+    let gameId: Date
     let minions: [Entity]
     let tooltipToRight: Bool
     let origin: CGPoint
@@ -372,6 +374,12 @@ private struct FinalBoardTooltipContainer: View {
         BattlegroundsFinalBoardTooltip(minions: minions,
                                        tooltipToRight: tooltipToRight,
                                        contentWidth: contentWidth)
+            // The minions are rebuilt Entity objects that all share the default
+            // id, and Entity's == compares ids only - so two boards of the same
+            // size look equal to SwiftUI and moving straight from one row to
+            // the next would keep drawing the first row's board. Keying on the
+            // game forces a fresh tooltip per row.
+            .id(gameId)
             .background(
                 GeometryReader { proxy in
                     Color.clear.preference(key: FinalBoardWidthPreferenceKey.self,
