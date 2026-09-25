@@ -663,10 +663,7 @@ struct MirrorHelper {
     }
 
     static func getBattlegroundsMinionPool() -> MirrorBattlegroundsMinionPool? {
-        var result: MirrorBattlegroundsMinionPool?
-        MirrorHelper.accessQueue.sync {
-            result = mirror?.getBattlegroundsMinionPool()
-        }
-        return result
+        // Needs HearthMirror 1a6012b5, see MinionPoolCompat.swift.
+        return nil
     }
 }

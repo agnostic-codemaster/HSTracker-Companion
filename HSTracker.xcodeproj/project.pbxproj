@@ -90,6 +90,7 @@
 		1CCB4ACF1E84708A003FD1AD /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 433554321D5F6B4400277B27 /* libz.tbd */; };
 		1CCB4AEB1E8A4930003FD1AD /* LogEventHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CCB4AEA1E8A4930003FD1AD /* LogEventHandlers.swift */; };
 		1CF204F91E83B74300037A42 /* MirrorHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CF204F81E83B74300037A42 /* MirrorHelper.swift */; };
+		AA11C0DE2F0010000000F002 /* MinionPoolCompat.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11C0DE2F0010000000F001 /* MinionPoolCompat.swift */; };
 		1CFE498FA33F086E309F8CB7 /* VulperaScoundrel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3D2CC748BEE000CA64F06DB /* VulperaScoundrel.swift */; };
 		1D2703E237423A67E20122D7 /* DraconicStudies.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABACC6E4541AF219E643ECE5 /* DraconicStudies.swift */; };
 		1DC8438909E340C1A06CCDCE /* OverlayMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509A26237869439FBDB6F7B0 /* OverlayMessageView.swift */; };
@@ -2025,6 +2026,7 @@
 		1CF1B5891E81426D007DCBF2 /* AlgorithmTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlgorithmTests.swift; sourceTree = "<group>"; };
 		1CF1B58B1E815810007DCBF2 /* LogReaderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogReaderTests.swift; sourceTree = "<group>"; };
 		1CF204F81E83B74300037A42 /* MirrorHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MirrorHelper.swift; sourceTree = "<group>"; };
+		AA11C0DE2F0010000000F001 /* MinionPoolCompat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinionPoolCompat.swift; sourceTree = "<group>"; };
 		1D0422A20A5FB8F80F170CE1 /* KaldoreiCultivator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KaldoreiCultivator.swift; sourceTree = "<group>"; };
 		1D52FE31E0E35DBE0A18FC1F /* GuidesTabsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidesTabsView.swift; sourceTree = "<group>"; };
 		1D707AD2B404BE840B16C2AF /* ForgottenMillennium.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgottenMillennium.swift; sourceTree = "<group>"; };
@@ -3959,6 +3961,7 @@
 				4323C5F61E1BE28800C97896 /* BrawlInfo.swift */,
 				4323C5E71E16963200C97896 /* MatchInfo.swift */,
 				1CF204F81E83B74300037A42 /* MirrorHelper.swift */,
+				AA11C0DE2F0010000000F001 /* MinionPoolCompat.swift */,
 			);
 			path = HearthMirror;
 			sourceTree = "<group>";
@@ -7573,6 +7576,7 @@
 				4349104C1D09739C00B22DB2 /* BoardHero.swift in Sources */,
 				B89656592E555D7200257DDC /* GolgannethTheThunderer.swift in Sources */,
 				1CF204F91E83B74300037A42 /* MirrorHelper.swift in Sources */,
+				AA11C0DE2F0010000000F002 /* MinionPoolCompat.swift in Sources */,
 				B854620F2CDE721F0083BB31 /* PlayerSide.swift in Sources */,
 				B846CC762E157B2400552F9C /* StoryOfBarnabus.swift in Sources */,
 				43D307FB1C83159C00480488 /* SizeHelper.swift in Sources */,
