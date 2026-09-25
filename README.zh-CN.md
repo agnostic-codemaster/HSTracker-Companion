@@ -14,9 +14,36 @@
 | [HSTracker_CHS](https://github.com/alamo68/HSTracker_CHS) | alamo68 | 直接父仓库。本仓库沿用它的 git 历史，包括中文化、禁用随从面板、Bob's Buddy 中文面板、合并的左上角面板等修改。 |
 | [hsbg-companion](https://github.com/zilinfg/hsbg-companion) | Zilin Fang | 拔线后端。它的连接识别与 pf 规则实现被移植为 `HSBGSkip` 守护进程，取代 HSTracker_CHS 原先基于 Clash 的拔线。 |
 
-在此之上，本仓库新增了：用 HSBGSkip 本地服务替代 Clash 拔线、按局归档 Power.log 并在重启后续读、拔线重连后拼接多段日志再上传 HSReplay、上传结果记录与重试，以及停用上游自动更新。
+本仓库在 HSTracker_CHS 之上做的改动，见 [相对 HSTracker_CHS 的改进](#相对-hstracker_chs-的改进)。
 
 同步上游时，`hstracker-chs` 远端指向 alamo68/HSTracker_CHS，`upstream` 远端指向 HearthSim/HSTracker。
+
+## 相对 HSTracker_CHS 的改进
+
+HSTracker_CHS 原有的功能全部保留。下面是本仓库新增或替换的部分。
+
+**拔线不再依赖 Clash**
+
+- 用本地 LaunchDaemon `HSBGSkip` 取代基于 Clash 的拔线，通过 pf 规则断开连接。不再需要 Clash、TUN 模式或代理配置。
+- 拔线目标取自 `GameNetLogger.log` 记录的对局服务器，并与炉石进程的实时连接比对。对局外、日志缺失或匹配到多条连接时拒绝拔线，不会按端口猜测。
+- 每次断线 3 秒，两次至少间隔 8 秒，避免连按时把重连也断掉。
+- 服务的安装、检测、升级和卸载都在应用内「拔线 → 服务设置…」完成。已有的 HSBG Companion 服务会被迁移；新服务未通过检查时自动恢复旧服务。
+
+**拔线重连后继续追踪**
+
+- 按局归档 Power.log 及读取位置，拔线重连或重启应用后可以接着追踪，不会丢掉这一局。
+- 酒馆战棋对局历史会保留缺少英雄或名次的对局，并标为「未知」「不完整」，而不是直接丢弃。
+
+**HSReplay 上传**
+
+- 重连导致一局被拆成多段 `CREATE_GAME` 时，会拼接成一局上传；拼接失败才退回上传最后一段可用日志并标为「部分」。
+- 只有发生过重连的对局才使用归档日志，其他对局照常上传。
+- 每次上传都记录为「完整」「部分」「被拒绝」或「待重试」，可在「拔线 → HSReplay 上传记录」查看；网络失败可从菜单重试。
+
+**其他**
+
+- 停用上游 HSTracker 的自动更新，避免本构建被覆盖。
+- 新增英文 README，以及同时同步两个上游的说明文档。
 
 ## 主要功能
 
