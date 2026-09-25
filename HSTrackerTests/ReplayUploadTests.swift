@@ -84,14 +84,79 @@ class ReplayUploadTests: HSTrackerTests {
         XCTAssertTrue(reloaded.retryCandidates().isEmpty)
     }
 
-    func testReconnectUploadUsesLastCreateAndMarksPartial() {
-        let lines = ["D 10:00 GameState.DebugPrintPower() - CREATE_GAME",
-                     "D 10:01 GameState.DebugPrintPower() - OLD_EVENT",
-                     "D 10:02 GameState.DebugPrintPower() - CREATE_GAME",
-                     "D 10:03 GameState.DebugPrintPower() - NEW_EVENT"]
-        let candidate = LogUploader.candidate(from: lines, reconnected: true)
-        XCTAssertEqual(candidate?.log, lines[2...].joined(separator: "\n"))
-        XCTAssertEqual(candidate?.partial, true)
+    private func power(_ text: String, _ time: String = "10:00:00.0000000") -> String {
+        "D \(time) GameState.DebugPrintPower() - \(text)"
+    }
+
+    private func reconnectFixture(secondPlayerEntity: Int = 2) -> (first: [String], second: [String]) {
+        let later = "10:05:00.0000000"
+        let first = [power("CREATE_GAME"),
+                     power("    GameEntity EntityID=1"),
+                     power("        tag=TURN value=1"),
+                     power("    Player EntityID=2 PlayerID=5 GameAccountId=[hi=1 lo=1]"),
+                     power("        tag=PLAYER_ID value=5"),
+                     "D 10:00:00.0000000 GameState.DebugPrintGame() - PlayerID=5, PlayerName=me#1",
+                     power("FULL_ENTITY - Creating ID=10 CardID=HERO_A"),
+                     power("    tag=ZONE value=PLAY"),
+                     power("    tag=CONTROLLER value=5"),
+                     power("BLOCK_START BlockType=PLAY Entity=10 EffectCardId= EffectIndex=0 Target=0 SubOption=-1 "),
+                     power("    FULL_ENTITY - Creating ID=11 CardID=MINION_A"),
+                     power("        tag=ZONE value=HAND"),
+                     power("        tag=EXHAUSTED value=1"),
+                     power("    TAG_CHANGE Entity=me#1 tag=RESOURCES value=3 ")]
+        let second = [power("CREATE_GAME", later),
+                      power("    GameEntity EntityID=1", later),
+                      power("        tag=TURN value=3", later),
+                      power("    Player EntityID=\(secondPlayerEntity) PlayerID=5 GameAccountId=[hi=1 lo=1]", later),
+                      power("        tag=PLAYER_ID value=5", later),
+                      power("        tag=RESOURCES value=3", later),
+                      power("FULL_ENTITY - Creating ID=10 CardID=HERO_A", later),
+                      power("    tag=ZONE value=PLAY", later),
+                      power("    tag=CONTROLLER value=5", later),
+                      power("FULL_ENTITY - Creating ID=11 CardID=MINION_A", later),
+                      power("    tag=ZONE value=PLAY", later),
+                      power("FULL_ENTITY - Creating ID=12 CardID=MINION_B", later),
+                      power("    tag=ZONE value=PLAY", later),
+                      power("TAG_CHANGE Entity=12 tag=ATK value=3 ", later)]
+        return (first, second)
+    }
+
+    /// 重连快照被换算成差异：闭合断线时未结束的 BLOCK，只补变化的标签，新实体补 FULL_ENTITY，
+    /// 最终只剩一个 CREATE_GAME，重连前的英雄与随从事件都保留下来。
+    func testReconnectUploadStitchesSegmentsIntoOneGame() throws {
+        let fixture = reconnectFixture()
+        let candidate = try XCTUnwrap(LogUploader.candidate(from: fixture.first + fixture.second,
+                                                            reconnected: true))
+        let later = "10:05:00.0000000"
+        let expected = fixture.first + [
+            power("BLOCK_END", later),
+            power("TAG_CHANGE Entity=GameEntity tag=TURN value=3 ", later),
+            power("TAG_CHANGE Entity=11 tag=ZONE value=PLAY ", later),
+            power("TAG_CHANGE Entity=11 tag=EXHAUSTED value=0 ", later),
+            power("FULL_ENTITY - Creating ID=12 CardID=MINION_B", later),
+            power("    tag=ZONE value=PLAY", later),
+            power("TAG_CHANGE Entity=12 tag=ATK value=3 ", later)
+        ]
+        XCTAssertEqual(candidate.log, expected.joined(separator: "\n"))
+        XCTAssertEqual(candidate.log.components(separatedBy: "CREATE_GAME").count - 1, 1)
+        XCTAssertEqual(candidate.stitched, 1)
+        XCTAssertTrue(candidate.partial)
+    }
+
+    /// 玩家实体对不上说明不是同一局，不能拼接，退回只上传最后一段。
+    func testReconnectUploadFallsBackToLastCreateWhenSegmentsDiffer() throws {
+        let fixture = reconnectFixture(secondPlayerEntity: 3)
+        let candidate = try XCTUnwrap(LogUploader.candidate(from: fixture.first + fixture.second,
+                                                            reconnected: true))
+        XCTAssertEqual(candidate.log, fixture.second.joined(separator: "\n"))
+        XCTAssertEqual(candidate.stitched, 0)
+        XCTAssertTrue(candidate.partial)
+    }
+
+    func testUploadCandidateBasics() {
+        let single = [power("CREATE_GAME"), power("TAG_CHANGE Entity=1 tag=TURN value=2 ")]
+        XCTAssertEqual(LogUploader.candidate(from: single, reconnected: false)?.partial, false)
+        XCTAssertEqual(LogUploader.candidate(from: single, reconnected: true)?.partial, true)
         XCTAssertNil(LogUploader.candidate(from: ["missing"], reconnected: false))
         XCTAssertTrue(LogUploader.retryableStatus(nil))
         XCTAssertTrue(LogUploader.retryableStatus(503))
