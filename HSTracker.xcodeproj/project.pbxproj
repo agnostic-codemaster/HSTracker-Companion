@@ -364,6 +364,7 @@
 		43C567FF1D5E4F9700451B6F /* HSReplayAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C567FE1D5E4F9700451B6F /* HSReplayAPI.swift */; };
 		43C568011D5E584F00451B6F /* LogUploader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C568001D5E584F00451B6F /* LogUploader.swift */; };
 		AA11C0DE2F0010000000D002 /* ReplayUploadStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11C0DE2F0010000000D001 /* ReplayUploadStore.swift */; };
+		AA11C0DE2F0010000000E002 /* ReconnectLogStitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11C0DE2F0010000000E001 /* ReconnectLogStitcher.swift */; };
 		43C568031D5E59E500451B6F /* UploadResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C568021D5E59E500451B6F /* UploadResult.swift */; };
 		43C568051D5E5BFF00451B6F /* UploadMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C568041D5E5BFF00451B6F /* UploadMetaData.swift */; };
 		43D307FB1C83159C00480488 /* SizeHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D307FA1C83159C00480488 /* SizeHelper.swift */; };
@@ -2282,6 +2283,7 @@
 		43C567FE1D5E4F9700451B6F /* HSReplayAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HSReplayAPI.swift; sourceTree = "<group>"; };
 		43C568001D5E584F00451B6F /* LogUploader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogUploader.swift; sourceTree = "<group>"; };
 		AA11C0DE2F0010000000D001 /* ReplayUploadStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReplayUploadStore.swift; sourceTree = "<group>"; };
+		AA11C0DE2F0010000000E001 /* ReconnectLogStitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReconnectLogStitcher.swift; sourceTree = "<group>"; };
 		43C568021D5E59E500451B6F /* UploadResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UploadResult.swift; sourceTree = "<group>"; };
 		43C568041D5E5BFF00451B6F /* UploadMetaData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UploadMetaData.swift; sourceTree = "<group>"; };
 		43D307FA1C83159C00480488 /* SizeHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SizeHelper.swift; sourceTree = "<group>"; };
@@ -4494,6 +4496,7 @@
 				4335543C1D5FAF0300277B27 /* HSReplayPreferences.xib */,
 				43C568001D5E584F00451B6F /* LogUploader.swift */,
 				AA11C0DE2F0010000000D001 /* ReplayUploadStore.swift */,
+				AA11C0DE2F0010000000E001 /* ReconnectLogStitcher.swift */,
 				B82E7B15262A798000C42EF0 /* ShortIdHelper.swift */,
 			);
 			path = HSReplay;
@@ -8355,6 +8358,7 @@
 				B89343422CD0791C009A8727 /* GalakrondCounter.swift in Sources */,
 				43C568011D5E584F00451B6F /* LogUploader.swift in Sources */,
 				AA11C0DE2F0010000000D002 /* ReplayUploadStore.swift in Sources */,
+				AA11C0DE2F0010000000E002 /* ReconnectLogStitcher.swift in Sources */,
 				439C7EBD1C777F8900D29859 /* TagClass.swift in Sources */,
 				43E77EE41C94A19700C26950 /* TurnTimer.swift in Sources */,
 				B89865522D8C6FCB00BA5649 /* ChiaDrake.swift in Sources */,
