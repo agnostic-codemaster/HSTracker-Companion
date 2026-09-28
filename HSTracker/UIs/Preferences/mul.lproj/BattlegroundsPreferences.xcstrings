@@ -86,7 +86,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "鲍勃之友"
+            "value" : "鲍勃助手"
           }
         }
       }
@@ -722,7 +722,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "时段回顾"
+            "value" : "对局回顾"
           }
         }
       }
@@ -1316,7 +1316,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "显示阵容统计（在时段回顾中）"
+            "value" : "显示流派统计（在对局回顾中）"
           }
         }
       }
@@ -1526,7 +1526,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "显示时段回顾"
+            "value" : "显示对局回顾"
           }
         }
       }
