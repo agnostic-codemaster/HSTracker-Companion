@@ -1271,6 +1271,12 @@
             "value" : "Last replays"
           }
         },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上次回放"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2579,6 +2585,12 @@
             "value" : "Replays"
           }
         },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回放"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3231,6 +3243,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Delete cached images..."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除缓存图像..."
           }
         }
       }

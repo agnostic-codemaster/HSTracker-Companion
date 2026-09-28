@@ -784,6 +784,12 @@
             "state" : "new",
             "value" : "Modes"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模式"
+          }
         }
       }
     },
@@ -801,6 +807,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Modes"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模式"
           }
         }
       }
@@ -1047,6 +1059,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Export with comments"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "带注释导出"
           }
         }
       }
@@ -1648,6 +1666,12 @@
             "state" : "translated",
             "value" : "Delete"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除套牌"
+          }
         }
       }
     },
@@ -1701,6 +1725,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Classes"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "职业"
           }
         }
       }
@@ -1756,6 +1786,12 @@
             "state" : "translated",
             "value" : "Classes"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "职业"
+          }
         }
       }
     },
@@ -1809,6 +1845,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Edit"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "修改套牌"
           }
         }
       }
@@ -2716,6 +2758,12 @@
             "state" : "translated",
             "value" : "Use"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用套牌"
+          }
         }
       }
     },
@@ -2859,6 +2907,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Export"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导出"
           }
         }
       }
@@ -3051,6 +3105,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rename"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重命名套牌"
           }
         }
       }

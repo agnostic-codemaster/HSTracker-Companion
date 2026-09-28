@@ -376,6 +376,12 @@
             "state" : "new",
             "value" : "Show corpses counter"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示残骸计数器"
+          }
         }
       }
     },
@@ -670,6 +676,12 @@
             "state" : "translated",
             "value" : "Afficher les compteurs"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示计数器"
+          }
         }
       }
     },
@@ -694,6 +706,12 @@
             "state" : "translated",
             "value" : "Afficher les effets actifs"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示生效中的效果"
+          }
         }
       }
     },
@@ -717,6 +735,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Afficher les maximums de points de vie, de mana et de cartes en main"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示生命值、法力值和手牌上限"
           }
         }
       }
@@ -994,6 +1018,12 @@
             "state" : "translated",
             "value" : "Afficher l'infobulle des cartes liées"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示相关卡牌提示"
+          }
         }
       }
     },
@@ -1161,6 +1191,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Autoriser la sélection du deck de l'adversaire hors parties amicales"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "允许在非友谊赛中设置对手套牌"
           }
         }
       }

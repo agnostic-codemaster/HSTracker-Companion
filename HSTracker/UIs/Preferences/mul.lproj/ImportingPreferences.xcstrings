@@ -22,6 +22,12 @@
             "state" : "translated",
             "value" : "Modèle"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模板"
+          }
         }
       }
     },
@@ -45,6 +51,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aventure"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "冒险"
           }
         }
       }
@@ -70,6 +82,12 @@
             "state" : "translated",
             "value" : "Modèle"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模板"
+          }
         }
       }
     },
@@ -93,6 +111,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Inclure les cartes passives"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "包括被动卡牌"
           }
         }
       }
@@ -118,6 +142,12 @@
             "state" : "translated",
             "value" : "Aperçu"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "预览"
+          }
         }
       }
     },
@@ -141,6 +171,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Arène"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "竞技场"
           }
         }
       }
@@ -166,6 +202,12 @@
             "state" : "translated",
             "value" : "Duels"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "对决"
+          }
         }
       }
     },
@@ -189,6 +231,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modèle"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模板"
           }
         }
       }
@@ -214,6 +262,12 @@
             "state" : "translated",
             "value" : "Donjon"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "地下城"
+          }
         }
       }
     },
@@ -237,6 +291,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aperçu"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "预览"
           }
         }
       }
@@ -262,6 +322,12 @@
             "state" : "translated",
             "value" : "Expédition en donjon"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "地下城"
+          }
         }
       }
     },
@@ -285,6 +351,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chasse aux monstres"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "怪物狩猎"
           }
         }
       }
@@ -310,6 +382,12 @@
             "state" : "translated",
             "value" : "Baston royale"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "挑战之旅"
+          }
         }
       }
     },
@@ -333,6 +411,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le Casse de Dalaran"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "达拉然大劫案"
           }
         }
       }
@@ -358,6 +442,12 @@
             "state" : "translated",
             "value" : "Les Tombes de la terreur"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "恐怖之墓"
+          }
         }
       }
     },
@@ -381,6 +471,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aperçu"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "预览"
           }
         }
       }
