@@ -503,6 +503,12 @@
             "value" : "Notifications are only visible if Hearthstone is not focused"
           }
         },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仅当炉石传说不在最前时显示通知"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
