@@ -18,3 +18,4 @@ git add <文件> && git rebase --continue
 ## 记录
 
 - 2026-09-25：3.6.12 → 3.6.13。冲突仅在 `AppDelegate.swift`（上游移除 `Preferences` 导入、调整 `completeSetup` 时机）和 `project.pbxproj`（新增 `RewoundEntityCreationFilter.swift`、版本号）。上游新增 Semi-Stable Portal 回溯重置，为此让存档日志只用于重连或中途启动的对局上传。
+- 2026-10-12：3.6.13 → 3.6.14。上游移除 PromiseKit（改 async/await）和 GzipSwift 等包：`LogUploader.swift` 保留本仓库的上传记录逻辑，改用 `import zlib` 和上游的 `Data.gzipped()`；`Http.swift` 用上游的 `uploadAsync`/`getAsync`，保留 `transportSummary` 日志。`BattlegroundsSessionViewModel` 上游把首局计算移到调用处，改为 `sessionGames.first(where: { !$0.isIncomplete })`。上游 HearthMirror `ec7b1d7e` 已公开，丢弃 `2cd1c7ce`（钉住 912e88ea 与 `MinionPoolCompat.swift`），本地 `local/hearthmirror-1a6012b5` 分支随之作废。
