@@ -10,7 +10,7 @@ This repository builds on three open-source projects:
 
 | Project | Author | Role here |
 | --- | --- | --- |
-| [HSTracker](https://github.com/HearthSim/HSTracker) | HearthSim | The tracker itself. Currently based on 3.6.13. |
+| [HSTracker](https://github.com/HearthSim/HSTracker) | HearthSim | The tracker itself. Currently based on 3.6.14. |
 | [HSTracker_CHS](https://github.com/alamo68/HSTracker_CHS) | alamo68 | Direct parent. This repository keeps its git history: the Chinese localization, the disabled-minions panel, the Chinese Bob's Buddy panel and the merged top-left panel. |
 | [hsbg-companion](https://github.com/zilinfg/hsbg-companion) | Zilin Fang | The disconnect backend. Its connection matching and pf rules were ported into the `HSBGSkip` daemon, replacing the Clash-based skip of HSTracker_CHS. |
 
@@ -83,8 +83,6 @@ Requires macOS 14 or later, Xcode, and working Swift Package Manager dependencie
 ```bash
 xcodebuild -project HSTracker.xcodeproj -scheme HSTracker -configuration Release CODE_SIGNING_ALLOWED=NO build
 ```
-
-HSTracker 3.6.13 needs HearthMirror `1a6012b5`, which HearthSim has not published on libs.hearthsim.net yet. This repository pins `912e88ea` instead, and `HSTracker/HearthMirror/MinionPoolCompat.swift` turns off reading the tavern minion pool from the game, so the minion browser falls back to the built-in database. The comment at the top of that file explains how to switch back once the new version is available.
 
 The build compiles `hsbgskipd` for arm64 and x86_64 and puts the universal binary into the app's resources. To install locally, run `Tools/package-local.sh <path to Release/HSTracker.app>`, which ad-hoc signs and verifies the whole bundle and zips it. An unsigned `CODE_SIGNING_ALLOWED=NO` build does not give macOS a stable identity for permissions. Ad-hoc signing keeps one build's identity stable on this Mac, but a new build may need to be authorized again. Developer ID signing and notarization are out of scope. Auto-updating from upstream HSTracker is turned off so it cannot replace this build.
 
