@@ -10,7 +10,7 @@
 
 | 项目 | 作者 | 在本仓库中的作用 |
 | --- | --- | --- |
-| [HSTracker](https://github.com/HearthSim/HSTracker) | HearthSim | 记牌器本体。当前基于 3.6.13。 |
+| [HSTracker](https://github.com/HearthSim/HSTracker) | HearthSim | 记牌器本体。当前基于 3.6.14。 |
 | [HSTracker_CHS](https://github.com/alamo68/HSTracker_CHS) | alamo68 | 直接父仓库。本仓库沿用它的 git 历史，包括中文化、禁用随从面板、Bob's Buddy 中文面板、合并的左上角面板等修改。 |
 | [hsbg-companion](https://github.com/zilinfg/hsbg-companion) | Zilin Fang | 拔线后端。它的连接识别与 pf 规则实现被移植为 `HSBGSkip` 守护进程，取代 HSTracker_CHS 原先基于 Clash 的拔线。 |
 
@@ -81,8 +81,6 @@ HSTracker_CHS 原有的功能全部保留。下面是本仓库新增或替换的
 ```bash
 xcodebuild -project HSTracker.xcodeproj -scheme HSTracker -configuration Release CODE_SIGNING_ALLOWED=NO build
 ```
-
-HSTracker 3.6.13 依赖的 HearthMirror `1a6012b5` 尚未由 HearthSim 发布到 libs.hearthsim.net，因此本仓库暂时固定使用 `912e88ea`，并通过 `HSTracker/HearthMirror/MinionPoolCompat.swift` 关闭「从游戏读取酒馆随从池」功能，随从浏览器回退到内置数据库。等新版可下载后，按该文件顶部注释即可恢复。
 
 构建阶段会分别编译 arm64 和 x86_64 的 `hsbgskipd`，合并后放入应用资源目录。用于本机安装时，运行 `Tools/package-local.sh <Release/HSTracker.app 路径>`，脚本会对整个应用包做临时签名并验证，再生成压缩包。直接使用 `CODE_SIGNING_ALLOWED=NO` 的构建产物会使 macOS 无法稳定识别应用的权限身份。临时签名仅保证同一构建在本机的身份一致；安装新的构建时仍可能需要重新授权。公开发布所需的开发者签名和公证不在本期范围内。为防止整合版被上游程序覆盖，上游自动更新已停用。
 
