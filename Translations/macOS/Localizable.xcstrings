@@ -24339,6 +24339,12 @@
             "state" : "translated",
             "value" : "Close"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭"
+          }
         }
       }
     },
@@ -24349,6 +24355,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Try again"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重试"
           }
         }
       }
@@ -24361,6 +24373,12 @@
             "state" : "translated",
             "value" : "The login was cancelled or did not complete. Please try again."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登录已取消或未完成，请重试。"
+          }
         }
       }
     },
@@ -24372,6 +24390,12 @@
             "state" : "translated",
             "value" : "The server did not respond as expected. Please make sure you're using the latest version of HSTracker and try again in a bit."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "服务器未按预期响应。请确认你使用的是最新版 HSTracker，并稍后重试。"
+          }
         }
       }
     },
@@ -24382,6 +24406,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Could not log in to HSReplay.net"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法登录 HSReplay.net"
           }
         }
       }
@@ -27597,6 +27627,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kein Deck ausgewählt."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未选择套牌。"
           }
         }
       }
