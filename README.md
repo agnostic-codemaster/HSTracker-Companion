@@ -10,7 +10,7 @@ This repository builds on three open-source projects:
 
 | Project | Author | Role here |
 | --- | --- | --- |
-| [HSTracker](https://github.com/HearthSim/HSTracker) | HearthSim | The tracker itself. Currently based on 3.7.0. |
+| [HSTracker](https://github.com/HearthSim/HSTracker) | HearthSim | The tracker itself. Currently based on 3.7.1. |
 | [HSTracker_CHS](https://github.com/alamo68/HSTracker_CHS) | alamo68 | Direct parent. This repository keeps its git history: the Chinese localization, the disabled-minions panel, the Chinese Bob's Buddy panel and the merged top-left panel. |
 | [hsbg-companion](https://github.com/zilinfg/hsbg-companion) | Zilin Fang | The disconnect backend. Its connection matching and pf rules were ported into the `HSBGSkip` daemon, replacing the Clash-based skip of HSTracker_CHS. |
 

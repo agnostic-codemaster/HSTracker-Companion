@@ -10,7 +10,7 @@
 
 | 项目 | 作者 | 在本仓库中的作用 |
 | --- | --- | --- |
-| [HSTracker](https://github.com/HearthSim/HSTracker) | HearthSim | 记牌器本体。当前基于 3.7.0。 |
+| [HSTracker](https://github.com/HearthSim/HSTracker) | HearthSim | 记牌器本体。当前基于 3.7.1。 |
 | [HSTracker_CHS](https://github.com/alamo68/HSTracker_CHS) | alamo68 | 直接父仓库。本仓库沿用它的 git 历史，包括中文化、禁用随从面板、Bob's Buddy 中文面板、合并的左上角面板等修改。 |
 | [hsbg-companion](https://github.com/zilinfg/hsbg-companion) | Zilin Fang | 拔线后端。它的连接识别与 pf 规则实现被移植为 `HSBGSkip` 守护进程，取代 HSTracker_CHS 原先基于 Clash 的拔线。 |
 
